@@ -13,6 +13,8 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Repositories;
 using ZeidLab.ToolBox.EasyPersistence.TestHelpers;
 
+using FluentAssertions;
+
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations;
 
 [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]
@@ -64,7 +66,7 @@ public class RepositoryBaseTests : IAsyncLifetime
         testUnitOfWork.Users.AddRange(entries);
         await testUnitOfWork.SaveChangesAsync();
         var allUsers = await testUnitOfWork.Users.GetAllAsync();
-        Assert.Equal(100, allUsers.Count);
+        allUsers.Count.Should().Be(100);
     }
 
     [Fact]
@@ -87,10 +89,11 @@ public class RepositoryBaseTests : IAsyncLifetime
         var retrievedUser = await testUnitOfWork.Users.GetByIdAsync(user.Id);
 
         // Assert
-        Assert.NotNull(retrievedUser);
-        Assert.Equal(user.Id, retrievedUser.Id);
-        Assert.Equal(user.Profile.Id, retrievedUser.Profile.Id);
+        retrievedUser.Should().NotBeNull();
+        retrievedUser.Id.Should().Be(user.Id);
+        retrievedUser.Profile.Id.Should().Be(user.Profile.Id);
     }
+
     [Fact]
     public async Task EntityId_ShouldBeSetAndRetrievedCorrectlyWhenIsSetFromConstructor()
     {
@@ -106,13 +109,13 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var allUsers = await testUnitOfWork.Users.GetAllAsync();
-        var retrievedUser = await testUnitOfWork.Users.GetByIdAsync(user.Id);
+        var allUsers = await testUnitOfWork.UsersWithGuid7.GetAllAsync();
+        var retrievedUser = await testUnitOfWork.UsersWithGuid7.GetByIdAsync(user.Id);
 
         // Assert
-        Assert.NotNull(allUsers);
-        Assert.NotNull(retrievedUser);
-        Assert.Equal(user.Id, retrievedUser.Id);
+        allUsers.Should().NotBeEmpty();
+        retrievedUser.Should().NotBeNull();
+        retrievedUser.Id.Should().Be(user.Id);
     }
 
     [Fact]
@@ -133,7 +136,7 @@ public class RepositoryBaseTests : IAsyncLifetime
         var result = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith");
 
         // Assert
-        Assert.Equal(2, result.Count);
+        result.Count.Should().Be(2);
     }
 
     [Fact]
@@ -153,8 +156,8 @@ public class RepositoryBaseTests : IAsyncLifetime
         var result = await testUnitOfWork.Users.FindFirstOrDefaultAsync(u => u.FirstName == "Charlie");
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Charlie", result.FirstName);
+        result.Should().NotBeNull();
+        result.FirstName.Should().Be("Charlie");
     }
 
     [Fact]
@@ -176,7 +179,7 @@ public class RepositoryBaseTests : IAsyncLifetime
 
         // Assert
         var result = await testUnitOfWork.Users.GetByIdAsync(user.Id);
-        Assert.Null(result);
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -197,8 +200,8 @@ public class RepositoryBaseTests : IAsyncLifetime
         var pagedResult = await testUnitOfWork.Users.GetPagedResultsAsync(1, 10);
 
         // Assert
-        Assert.Equal(10, pagedResult.Items.Count);
-        Assert.Equal(50, pagedResult.TotalItems);
+        pagedResult.Items.Count.Should().Be(10);
+        pagedResult.TotalItems.Should().Be(50);
     }
 
     [Fact]
@@ -216,10 +219,10 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var result = await testUnitOfWork.Users.FuzzySearchAsync("Clark", u => true, 0, 10, nameof(User.LastName));
+        var result = await testUnitOfWork.Users.FuzzySearchAsync("Clark",  0, 10, nameof(User.LastName));
 
         // Assert
-        Assert.Equal(2, result.Items.Count);
+        result.Items.Count.Should().Be(2);
     }
 
     [Fact]
@@ -243,7 +246,7 @@ public class RepositoryBaseTests : IAsyncLifetime
 
         // Assert
         var allUsers = await testUnitOfWork.Users.GetAllAsync();
-        Assert.Equal(2, allUsers.Count);
+        allUsers.Count.Should().Be(2);
     }
 
     public async Task InitializeAsync()
