@@ -12,7 +12,8 @@ public class UserConfig : IEntityTypeConfiguration<User>
 
         builder.HasOne(u => u.Profile)
             .WithOne()
-            .HasForeignKey<UserProfile>(p => p.UserId)
+            .HasForeignKey<UserProfile>( u => u.Id)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -149,7 +149,7 @@ public sealed class TestDbGenerator : IAsyncDisposable
         return new TestDbGenerator(sqlServer: true);
     }
 
-    public async ValueTask MakeSureIsRunning()
+    public async ValueTask MakeSureIsRunningAsync()
     {
         if (_isRunning || _isAboutToRun)
             return;
@@ -157,7 +157,7 @@ public sealed class TestDbGenerator : IAsyncDisposable
             await StartAsync();
     }
 
-    public async ValueTask MakeSureIsStopped()
+    public async ValueTask MakeSureIsStoppedAsync()
     {
         if (!_isRunning || _isStopping)
             return;
@@ -189,7 +189,7 @@ public sealed class TestDbGenerator : IAsyncDisposable
         }
     }
 
-    public async ValueTask StartAsync()
+    private async ValueTask StartAsync()
     {
         if (_isAboutToRun)
             return;

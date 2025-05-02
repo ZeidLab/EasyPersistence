@@ -5,9 +5,9 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Repositories;
 
-internal sealed class Users :RepositoryBase<User,Guid> ,IUsers
+internal sealed class UsersRepository :RepositoryBase<User,Guid> ,IUsersRepository
 {
-    public Users(DbContext context) : base(context)
+    public UsersRepository(DbContext context) : base(context)
     {
     }
 }

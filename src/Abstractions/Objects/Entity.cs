@@ -9,8 +9,13 @@ namespace ZeidLab.ToolBox.EasyPersistence.Abstractions;
 public abstract class Entity<TId> : IEquatable<Entity<TId>>
     where TId : notnull
 {
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    protected Entity(TId id = default!)
+    {
+       Id = id;
+    }
     [Key]
-    public TId Id { get; private set; } =  default!;
+    public TId Id { get; private set; }
 
     public static bool operator ==(Entity<TId>? first, Entity<TId>? second) =>
         first is not null && second is not null && first.Equals(second);

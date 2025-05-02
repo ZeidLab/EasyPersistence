@@ -8,7 +8,16 @@ public class UserProfile: Entity<Guid>
     private UserProfile()
     {
     }
-    public Guid UserId { get; set; }
-    public string? Address { get; set; }
-    public string? PhoneNumber { get; set; }
+    public User User { get; private set; }
+    public string? Address { get;private set; }
+    public string? PhoneNumber { get;private set; }
+
+    public static UserProfile Create( string? address, string? phoneNumber)
+    {
+        return new UserProfile
+        {
+            Address = address,
+            PhoneNumber = phoneNumber
+        };
+    }
 }
