@@ -9,13 +9,8 @@ namespace ZeidLab.ToolBox.EasyPersistence.Abstractions;
 public abstract class Entity<TId> : IEquatable<Entity<TId>>
     where TId : notnull
 {
-    protected Entity(TId? id)
-    {
-        Id = id ?? default!;
-    }
-
     [Key]
-    public TId Id { get; protected set; }
+    public TId Id { get; private set; } =  default!;
 
     public static bool operator ==(Entity<TId>? first, Entity<TId>? second) =>
         first is not null && second is not null && first.Equals(second);
