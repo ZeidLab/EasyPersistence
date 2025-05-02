@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+
 using FluentAssertions;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 using ZeidLab.ToolBox.EasyPersistence.Abstractions;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
@@ -24,7 +27,10 @@ public sealed class HelperMethodsTests : IAsyncLifetime
         var services = new ServiceCollection();
 
         services.AddDbContext<TestDbContext>(options =>
-            options.UseSqlServer(_dbGenerator.SqlServerConnectionString));
+        {
+            options.UseSqlServer(_dbGenerator.SqlServerConnectionString);
+            options.EnableSensitiveDataLogging();
+        });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
@@ -244,9 +250,9 @@ public sealed class HelperMethodsTests : IAsyncLifetime
         await dbContext.Database.EnsureCreatedAsync();
 
         var users = Enumerable.Range(1, 20).Select(i =>
-            User.Create($"User{i}", i % 2 == 0 ? "Smith" : "Johnson", $"user{i}@example.com", 
-            new DateTime(1990, 1, 1).AddDays(i))).ToList();
-        
+            User.Create($"User{i}", i % 2 == 0 ? "Smith" : "Johnson", $"user{i}@example.com",
+                new DateTime(1990, 1, 1).AddDays(i))).ToList();
+
         await dbContext.Users.AddRangeAsync(users);
         await dbContext.SaveChangesAsync();
 

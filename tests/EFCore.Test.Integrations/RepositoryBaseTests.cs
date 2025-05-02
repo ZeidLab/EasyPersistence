@@ -29,8 +29,10 @@ public class RepositoryBaseTests : IAsyncLifetime
         var services = new ServiceCollection();
 
         services.AddDbContext<TestDbContext>(options =>
-            options.UseSqlServer(_dbGenerator.SqlServerConnectionString));
-
+        {
+            options.UseSqlServer(_dbGenerator.SqlServerConnectionString);
+            options.EnableSensitiveDataLogging();
+        });
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
 
