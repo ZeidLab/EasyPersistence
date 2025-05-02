@@ -63,7 +63,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         int page = 0, int pageSize = 10)
     {
         var query = _context.Set<TEntity>().Where(predicate);
-        var itemsCount = query.AsNoTracking().CountAsync();
+        var itemsCount = query.AsNoTracking().LongCountAsync();
         var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
         await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
         return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
@@ -71,7 +71,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
 
     public async Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize)
     {
-        var itemsCount = _context.Set<TEntity>().AsNoTracking().CountAsync();
+        var itemsCount = _context.Set<TEntity>().AsNoTracking().LongCountAsync();
         var items = _context.Set<TEntity>().Skip(page * pageSize).Take(pageSize).ToListAsync();
         await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
         return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
@@ -85,7 +85,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         var query = _context.Set<TEntity>().Where(predicate)
             .Where(x => fieldsToSearch.Any(fieldToSearch
                 => EF.Functions.Like(fieldToSearch, $"%{searchTerm}%")));
-        var itemsCount = query.AsNoTracking().CountAsync();
+        var itemsCount = query.AsNoTracking().LongCountAsync();
         var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
         await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
         return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
@@ -97,7 +97,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         var query = _context.Set<TEntity>()
             .Where(x => fieldsToSearch.Any(fieldToSearch
                 => EF.Functions.Like(fieldToSearch, $"%{searchTerm}%")));
-        var itemsCount = query.AsNoTracking().CountAsync();
+        var itemsCount = query.AsNoTracking().LongCountAsync();
         var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
         await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
         return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
