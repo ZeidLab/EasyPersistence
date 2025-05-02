@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ZeidLab.ToolBox.EasyPersistence.Abstractions;
+using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
@@ -59,47 +60,34 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         _context.Set<TEntity>().RemoveRange(entities);
     }
 
-    public async Task<PagedResult<TEntity>> GetPagedResultsAsync(Expression<Func<TEntity, bool>> predicate,
+    public Task<PagedResult<TEntity>> GetPagedResultsAsync(Expression<Func<TEntity, bool>> predicate,
         int page = 0, int pageSize = 10)
     {
-        var query = _context.Set<TEntity>().Where(predicate);
-        var itemsCount = query.AsNoTracking().LongCountAsync();
-        var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
-        await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
-        return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
-    }
+        return _context.Set<TEntity>()
+            .Where(predicate)
+            .GetPagedResultsAsync(page, pageSize);
+        }
 
-    public async Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize)
+    public Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize)
     {
-        var itemsCount = _context.Set<TEntity>().AsNoTracking().LongCountAsync();
-        var items = _context.Set<TEntity>().Skip(page * pageSize).Take(pageSize).ToListAsync();
-        await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
-        return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
+        return _context.Set<TEntity>()
+            .GetPagedResultsAsync(page, pageSize);
     }
 
-
-    public async Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
+    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
         Expression<Func<TEntity, bool>> predicate, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
-        var query = _context.Set<TEntity>().Where(predicate)
-            .Where(x => fieldsToSearch.Any(fieldToSearch
-                => EF.Functions.Like(fieldToSearch, $"%{searchTerm}%")));
-        var itemsCount = query.AsNoTracking().LongCountAsync();
-        var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
-        await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
-        return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
+        return  _context.Set<TEntity>().Where(predicate)
+            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+            .GetPagedResultsAsync(page, pageSize);
     }
 
-    public async Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm, int page = 0, int pageSize = 10,
+    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
-        var query = _context.Set<TEntity>()
-            .Where(x => fieldsToSearch.Any(fieldToSearch
-                => EF.Functions.Like(fieldToSearch, $"%{searchTerm}%")));
-        var itemsCount = query.AsNoTracking().LongCountAsync();
-        var items = query.Skip(page * pageSize).Take(pageSize).ToListAsync();
-        await Task.WhenAll(itemsCount, items).ConfigureAwait(false);
-        return new PagedResult<TEntity>(await items.ConfigureAwait(false), await itemsCount.ConfigureAwait(false));
+       return _context.Set<TEntity>()
+            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+        .GetPagedResultsAsync(page, pageSize);
     }
 }
