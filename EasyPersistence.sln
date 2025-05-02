@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{84933542-7AEA-4055-AB08-6E22DF68EB59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FDE29923-9F23-44A0-B637-B5C921D58104}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{4A7F29E1-24AD-4B6C-BBC8-7DACAE19EECB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Packages.props = Directory.Packages.props
+		nuget.config = nuget.config
+		BannedSymbols.txt = BannedSymbols.txt
+		AssemblyInfo.cs = AssemblyInfo.cs
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9A93824F-1E1C-435A-A424-13CD43614A0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore", "src\EFCore\EFCore.csproj", "{2DF2B027-3F72-418F-A398-2955FE82C78E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore.Test.Units", "tests\EFCore.Test.Units\EFCore.Test.Units.csproj", "{70C64223-2914-4FD3-9F47-AE86C370659F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstractions", "src\Abstractions\Abstractions.csproj", "{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHelpers", "tests\TestHelpers\TestHelpers.csproj", "{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore.Test.Integrations", "tests\EFCore.Test.Integrations\EFCore.Test.Integrations.csproj", "{B07431E6-AA29-403D-9443-4E0468DC5919}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DF2B027-3F72-418F-A398-2955FE82C78E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF2B027-3F72-418F-A398-2955FE82C78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF2B027-3F72-418F-A398-2955FE82C78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF2B027-3F72-418F-A398-2955FE82C78E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70C64223-2914-4FD3-9F47-AE86C370659F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70C64223-2914-4FD3-9F47-AE86C370659F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70C64223-2914-4FD3-9F47-AE86C370659F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70C64223-2914-4FD3-9F47-AE86C370659F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B07431E6-AA29-403D-9443-4E0468DC5919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B07431E6-AA29-403D-9443-4E0468DC5919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B07431E6-AA29-403D-9443-4E0468DC5919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B07431E6-AA29-403D-9443-4E0468DC5919}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2DF2B027-3F72-418F-A398-2955FE82C78E} = {84933542-7AEA-4055-AB08-6E22DF68EB59}
+		{70C64223-2914-4FD3-9F47-AE86C370659F} = {FDE29923-9F23-44A0-B637-B5C921D58104}
+		{5909AA5D-3CD6-4DB8-AFD1-6A6A480818DB} = {84933542-7AEA-4055-AB08-6E22DF68EB59}
+		{AE3F2D37-1BE4-4751-AE3B-E654C3CB30CC} = {FDE29923-9F23-44A0-B637-B5C921D58104}
+		{B07431E6-AA29-403D-9443-4E0468DC5919} = {FDE29923-9F23-44A0-B637-B5C921D58104}
+	EndGlobalSection
+EndGlobal

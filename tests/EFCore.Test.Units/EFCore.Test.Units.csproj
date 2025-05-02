@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <TestProject>true</TestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>

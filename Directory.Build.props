@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  
+  <PropertyGroup Label="NuspecSettings">
+    <Company>ZeidLabCo</Company>
+    <Authors>Zeid Youssefzadeh</Authors>
+    <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
+    <Trademark>$(Company)™</Trademark>
+    <Product>$(Company) Projects</Product>
+    <NeutralLanguage>en</NeutralLanguage> <!-- The default language of the package -->
+  </PropertyGroup>
+
+
+
+  
+  <PropertyGroup>
+    <RootNamespace>ZeidLab.ToolBox.EasyPersistence.$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>EasyPersistence.$(MSBuildProjectName)</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latestmajor</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Optimize>True</Optimize>
+    <!--  This does not make sense at all  -->
+    <!--    <NoWarn>$(NoWarn)</NoWarn>-->
+    <!--    <NoError>$(NoError)</NoError>-->
+    <AccelerateBuildsInVisualStudio>True</AccelerateBuildsInVisualStudio>
+  </PropertyGroup>
+  <PropertyGroup Label="Main project properties only"
+                 Condition="$(MSBuildProjectDirectory.Contains('src'))">
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>True</CodeAnalysisTreatWarningsAsErrors>
+    <ReportAnalyzer>True</ReportAnalyzer>
+    <Deterministic>True</Deterministic>
+    <Features>strict</Features>
+  </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Link="Properties/BannedSymbols.txt"/>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" Link="Properties/AssemblyInfo.common.cs"/>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,89 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>True</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.4"/>
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.4"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4"/>
+    <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0"/>
+    <PackageVersion Include="System.Text.Json" Version="9.0.4"/>
+
+  </ItemGroup>
+  <ItemGroup Label="Test">
+    <!--    Common Packages -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+    <PackageVersion Include="xunit" Version="2.9.3"/>
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2"/>
+    <PackageVersion Include="coverlet.collector" Version="6.0.4"/>
+    <PackageVersion Include="Testcontainers" Version="4.4.0"/>
+    <PackageVersion Include="Bogus" Version="35.6.3"/>
+    <PackageVersion Include="FluentAssertions" Version="8.2.0"/>
+    <PackageVersion Include="Verify.Xunit" Version="30.0.0"/>
+    <PackageVersion Include="NSubstitute" Version="5.3.0"/>
+  </ItemGroup>
+  <ItemGroup Label="Code Analyzers PackageVersions">
+    <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0"/>
+    <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4"/>
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.13.1"/>
+    <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.13.1"/>
+    <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.13.1"/>
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.9.0.115408"/>
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.199"/>
+    <PackageVersion Include="SecurityCodeScan.VS2019" Version="5.6.7"/>
+    <PackageVersion Include="AsyncMethodNameFixer" Version="2.3.0"/>
+    <PackageVersion Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1"/>
+    <PackageVersion Include="ConfigureAwaitEnforcer" Version="2.0.0"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Code Analyzers" Condition="$(MSBuildProjectDirectory.Contains('src'))">
+    <PackageReference Include="AsyncMethodNameFixer"/>
+    <PackageReference Include="ConfigureAwaitChecker.Analyzer"/>
+    <PackageReference Include="ConfigureAwaitEnforcer"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"/>
+    <PackageReference Include="Roslynator.Analyzers"/>
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers"/>
+    <PackageReference Include="Roslynator.Formatting.Analyzers"/>
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Meziantou.Analyzer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SecurityCodeScan.VS2019"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Test Project Package References" Condition="$(MSBuildProjectName.Contains('.Test.'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="xunit"/>
+    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="Verify.Xunit"/>
+    <PackageReference Include="Bogus"/>
+    <PackageReference Include="NSubstitute"/>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <Using Include="Xunit"/>
+  </ItemGroup>
+  <ItemGroup Label="UI Test Project Package References" Condition="$(MSBuildProjectName.EndsWith('.Test.UI'))">
+    <PackageReference Include="Microsoft.Playwright"/>
+    <PackageReference Include="Reqnroll.xUnit"/>
+    <PackageReference Include="Testcontainers"/>
+    <Using Include="Microsoft.Playwright"/>
+    <Using Include="Reqnroll"/>
+    <Using Include="Reqnroll.xUnit"/>
+  </ItemGroup>
+</Project>

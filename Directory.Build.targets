@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Define the path to the project files-->
+  <PropertyGroup Label="Projects">
+    <ExchangeCore>$(MSBuildThisFileDirectory)\src\Core\*.csproj</ExchangeCore>
+    <ExchangeInfrastructure>$(MSBuildThisFileDirectory)\src\Infrastructure\*.csproj</ExchangeInfrastructure>
+    <ExchangeWebApp>$(MSBuildThisFileDirectory)\src\WebApp\*.csproj</ExchangeWebApp>
+    <TestsHelperProject>$(MSBuildThisFileDirectory)\tests\TestHelpers\*.csproj</TestsHelperProject>
+  </PropertyGroup>
+
+  <!--Define the path to the project files-->
+  <ItemGroup Label="Test"
+             Condition="$(MSBuildProjectName.Contains('.Test.'))">
+    <ProjectReference Include="$(ExchangeCore)"/>
+    <ProjectReference Include="$(ExchangeInfrastructure)"/>
+    <ProjectReference Include="$(ExchangeWebApp)"/>
+    <ProjectReference Include="$(TestsHelperProject)"/>
+  </ItemGroup>
+
+<!--  Set internal visibility for Tests and for NSubstitute-->
+  <ItemGroup Label="Test Assembly Attributes"
+    Condition="$(MSBuildProjectDirectory.Contains('src'))">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.UI</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Integrations</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Units</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+﻿You need to pull the image before running the tests
+docker pull testcontainers/ryuk:0.9.0
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker pull redis
+docker pull mongo
+
+# Docker image build command for local use :
+# from other directory
+docker build -f src/WebApp/Dockerfile -t web-app-container:latest D:\HushMovaziProjects\Exchange
+# from project directory
+docker build -f src/WebApp/Dockerfile -t web-app-container:latest ./
