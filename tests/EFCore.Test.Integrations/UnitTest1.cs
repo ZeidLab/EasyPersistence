@@ -17,17 +17,18 @@ public class UnitTest1
 
         using var context = new TestDbContext(options);
 
+        var profileFaker = new Faker<UserProfile>()
+            .RuleFor(p => p.Id, _ => Guid.NewGuid()) // GUID v7
+            .RuleFor(p => p.Address, f => f.Address.FullAddress())
+            .RuleFor(p => p.PhoneNumber, f => f.Phone.PhoneNumber());
+
         var userFaker = new Faker<User>()
             .RuleFor(u => u.Id, f => Guid.NewGuid()) // GUID v7
             .RuleFor(u => u.FirstName, f => f.Name.FirstName())
             .RuleFor(u => u.LastName, f => f.Name.LastName())
             .RuleFor(u => u.Email, f => f.Internet.Email())
             .RuleFor(u => u.DateOfBirth, f => f.Date.Past(30, DateTime.Now.AddYears(-18)))
-            .RuleFor(u => u.Profiles, f => new Faker<UserProfile>()
-                .RuleFor(p => p.Id, _ => Guid.NewGuid()) // GUID v7
-                .RuleFor(p => p.Address, f => f.Address.FullAddress())
-                .RuleFor(p => p.PhoneNumber, f => f.Phone.PhoneNumber())
-                .Generate(f.Random.Int(1, 3))); // 1-3 profiles per user
+            .RuleFor(u => u.Profile, _ => profileFaker.Generate());
 
         var users = userFaker.Generate(100);
 
