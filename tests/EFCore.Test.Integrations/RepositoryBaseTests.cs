@@ -6,13 +6,17 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations;
 
-public class UnitTest1
+public class RepositoryBaseTests
 {
+    public RepositoryBaseTests()
+    {
+        
+    }
     [Fact]
     public async Task GenerateUsersWithProfiles()
     {
         var options = new DbContextOptionsBuilder<TestDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .UseSqlServer(databaseName: "TestDatabase")
             .Options;
 
         using var context = new TestDbContext(options);
