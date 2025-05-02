@@ -2,7 +2,7 @@
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 
-public class User : Entity<Guid>, IAggregateRoot
+public sealed class User : Entity<Guid>, IAggregateRoot
 {
     // EF Core requires a parameterless constructor for EF Core to create instances of the entity
     private User() 

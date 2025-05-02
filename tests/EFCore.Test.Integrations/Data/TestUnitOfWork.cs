@@ -6,12 +6,15 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 internal sealed class TestUnitOfWork : ITestUnitOfWork
 {
     public IUsersRepository Users { get; }
+    public IUsersWithGuid7Repository UsersWithGuid7 { get; }
+
     private readonly TestDbContext _context;
 
     public TestUnitOfWork(TestDbContext context)
     {
         _context = context;
         Users = new UsersRepository(context);
+        UsersWithGuid7 = new UsersWithGuid7Repository(context);
     }
 
     public ValueTask DisposeAsync()

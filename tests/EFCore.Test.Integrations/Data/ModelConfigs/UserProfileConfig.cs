@@ -20,7 +20,7 @@ public class UserProfileConfig : IEntityTypeConfiguration<UserProfile>
 
         builder.HasOne(u => u.User)
             .WithOne(u => u.Profile)
-            .HasForeignKey<User>(u => u.Id)
+            .HasForeignKey<UserProfile>(u => u.UserId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }
