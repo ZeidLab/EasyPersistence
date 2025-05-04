@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+
 using Microsoft.EntityFrameworkCore;
+
 using ZeidLab.ToolBox.EasyPersistence.Abstractions;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
+
 [CLSCompliant(false)] // Mark the class as non-CLS-compliant
 [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
 public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEntityId>
@@ -66,7 +69,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         return _context.Set<TEntity>()
             .Where(predicate)
             .GetPagedResultsAsync(page, pageSize);
-        }
+    }
 
     public Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize)
     {
@@ -78,7 +81,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
         Expression<Func<TEntity, bool>> predicate, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
-        return  _context.Set<TEntity>().Where(predicate)
+        return _context.Set<TEntity>().Where(predicate)
             .ApplyFuzzySearch(searchTerm, fieldsToSearch)
             .GetPagedResultsAsync(page, pageSize);
     }
@@ -86,8 +89,29 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
     public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
-       return _context.Set<TEntity>()
+        return _context.Set<TEntity>()
             .ApplyFuzzySearch(searchTerm, fieldsToSearch)
-        .GetPagedResultsAsync(page, pageSize);
+            .GetPagedResultsAsync(page, pageSize);
+    }
+
+    public Task<int> UpdatePropertyAsync<TProperty>(
+        Expression<Func<TEntity, bool>> predicate,
+        params (Func<TEntity, TProperty> Selector, TProperty Value)[] setters)
+    {
+        // Build the Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>>
+        var settersExpression = HelperMethods
+            .BuildSettersExpression<TEntity, TProperty>(setters);
+
+        // Execute the update with the dynamically built expression
+        return _context.Set<TEntity>()
+            .Where(predicate)
+            .ExecuteUpdateAsync(settersExpression);
+    }
+
+    public Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return _context.Set<TEntity>()
+            .Where(predicate)
+            .ExecuteDeleteAsync();
     }
 }

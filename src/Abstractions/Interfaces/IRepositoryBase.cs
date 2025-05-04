@@ -31,4 +31,11 @@ public interface IRepositoryBase<TEntity, in TEntityId>
 
     public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
         int page = 0, int pageSize = 10, params string[] fieldsToSearch);
+
+    // Batch update properties without retrieving entities
+    Task<int> UpdatePropertyAsync<TProperty>(Expression<Func<TEntity, bool>> predicate,
+        params (Func<TEntity, TProperty> Selector, TProperty Value)[] setters);
+
+    // Batch delete entities matching a predicate without retrieving them
+    Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate);
 }

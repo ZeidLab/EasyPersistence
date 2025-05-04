@@ -21,7 +21,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 {
     private readonly ServiceProvider _serviceProvider;
     private readonly TestDbGenerator _dbGenerator = TestDbGenerator.GenerateSqlServerOnly();
-
+    //TODO: WriteDown test methods to see the generated expression and SQL queries
     public HelperMethodsTests()
     {
         var services = new ServiceCollection();
@@ -279,6 +279,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
             .ToList();
     }
 
+    
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();

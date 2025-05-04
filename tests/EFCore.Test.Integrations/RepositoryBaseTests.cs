@@ -251,6 +251,134 @@ public class RepositoryBaseTests : IAsyncLifetime
         allUsers.Count.Should().Be(2);
     }
 
+    [Fact]
+    public async Task UpdatePropertyAsync_WithSingleProperty_ShouldUpdateMatchingEntities()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        // Arrange
+        var users = new List<User>
+        {
+            User.Create("John", "Smith", "john.smith@example.com", new DateTime(1990, 1, 1)),
+            User.Create("Jane", "Smith", "jane.smith@example.com", new DateTime(1992, 3, 15)),
+            User.Create("Mark", "Johnson", "mark.johnson@example.com", new DateTime(1985, 7, 22))
+        };
+        testUnitOfWork.Users.AddRange(users);
+        await testUnitOfWork.SaveChangesAsync();
+
+        // Act
+        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync(
+            u => u.LastName == "Smith",
+            (u => u.LastName, "Smith-Updated")
+        );
+
+        // Assert
+        updatedRows.Should().Be(2); // Two rows should be updated
+        
+        // Verify update in database
+        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith-Updated");
+        updatedUsers.Count.Should().Be(2);
+        updatedUsers.All(u => u.LastName == "Smith-Updated").Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdatePropertyAsync_WithMultipleProperties_ShouldUpdateMatchingEntities()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        // Arrange
+        var users = new List<User>
+        {
+            User.Create("John", "Smith", "john.smith@example.com", new DateTime(1990, 1, 1)),
+            User.Create("Jane", "Smith", "jane.smith@example.com", new DateTime(1992, 3, 15)),
+            User.Create("Mark", "Johnson", "mark.johnson@example.com", new DateTime(1985, 7, 22))
+        };
+        testUnitOfWork.Users.AddRange(users);
+        await testUnitOfWork.SaveChangesAsync();
+
+        // Act
+        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<string>(
+            u => u.LastName == "Smith",
+            (u => u.FirstName, "Updated-FirstName"),
+            (u => u.LastName, "Updated-LastName")
+        );
+
+        // Assert
+        updatedRows.Should().Be(2); // Two rows should be updated
+        
+        // Verify update in database
+        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Updated-LastName");
+        updatedUsers.Count.Should().Be(2);
+        updatedUsers.All(u => u.FirstName == "Updated-FirstName" && u.LastName == "Updated-LastName").Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdatePropertyAsync_WithDifferentPropertyTypes_ShouldUpdateMatchingEntities()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        // Arrange
+        var users = new List<User>
+        {
+            User.Create("John", "Smith", "john.smith@example.com", new DateTime(1990, 1, 1)),
+            User.Create("Jane", "Smith", "jane.smith@example.com", new DateTime(1992, 3, 15))
+        };
+        testUnitOfWork.Users.AddRange(users);
+        await testUnitOfWork.SaveChangesAsync();
+
+        var newDate = new DateTime(2000, 1, 1);
+
+        // Act
+        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<DateTime>(
+            u => u.LastName == "Smith",
+            (u => u.DateOfBirth, newDate)
+        );
+
+        // Assert
+        updatedRows.Should().Be(2); // Two rows should be updated
+        
+        // Verify update in database
+        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith");
+        updatedUsers.Count.Should().Be(2);
+        updatedUsers.All(u => u.DateOfBirth == newDate).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdatePropertyAsync_NoMatchingEntities_ShouldReturnZero()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        // Arrange
+        var users = new List<User>
+        {
+            User.Create("John", "Smith", "john.smith@example.com", new DateTime(1990, 1, 1)),
+            User.Create("Jane", "Smith", "jane.smith@example.com", new DateTime(1992, 3, 15))
+        };
+        testUnitOfWork.Users.AddRange(users);
+        await testUnitOfWork.SaveChangesAsync();
+
+        // Act
+        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<string>(
+            u => u.LastName == "NonExistent",
+            (u => u.FirstName, "Updated")
+        );
+
+        // Assert
+        updatedRows.Should().Be(0); // No rows should be updated
+    }
+
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();

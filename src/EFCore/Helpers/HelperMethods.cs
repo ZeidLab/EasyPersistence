@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 using ZeidLab.ToolBox.EasyPersistence.Abstractions;
 
@@ -152,5 +154,48 @@ public static class HelperMethods
         {
             return ReferenceEquals(node, _old) ? _new : base.VisitParameter(node);
         }
+    }
+
+    [CLSCompliant(false)]
+    public static Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>>
+        BuildSettersExpression<TEntity, TProperty>(
+            (Func<TEntity, TProperty> Selector, TProperty Value)[] setters)
+        where TEntity : class
+    {
+        // Handle empty setters case
+        if (setters.Length == 0)
+        {
+            var param = Expression.Parameter(typeof(SetPropertyCalls<TEntity>), "s");
+            return Expression.Lambda<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>>(param, param);
+        }
+
+        // Define the parameter
+        var builderParam = Expression.Parameter(typeof(SetPropertyCalls<TEntity>), "s");
+        Expression body = builderParam;
+
+        // Find the SetProperty method
+        var setPropertyMethod = typeof(SetPropertyCalls<TEntity>).GetMethods()
+            .First(m =>
+                string.Equals(m.Name, "SetProperty", StringComparison.Ordinal) &&
+                m.IsGenericMethodDefinition &&
+                m.GetParameters().Length == 2);
+
+        // For each setter, append a SetProperty call
+        foreach (var (selector, value) in setters)
+        {
+            var genericMethod = setPropertyMethod.MakeGenericMethod(typeof(TProperty));
+            var selectorConst = Expression.Constant(selector);
+
+            // Create a lambda expression that always returns the constant value
+            var entityParam = Expression.Parameter(typeof(TEntity), "e");
+            var valueExpr = Expression.Lambda<Func<TEntity, TProperty>>(
+                Expression.Constant(value, typeof(TProperty)),
+                entityParam
+            );
+
+            body = Expression.Call(body, genericMethod, selectorConst, valueExpr);
+        }
+
+        return Expression.Lambda<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>>(body, builderParam);
     }
 }
