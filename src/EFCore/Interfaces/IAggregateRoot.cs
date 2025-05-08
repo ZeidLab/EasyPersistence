@@ -1,4 +1,4 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace ZeidLab.ToolBox.EasyPersistence.Abstractions;
+namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
 public interface IAggregateRoot;

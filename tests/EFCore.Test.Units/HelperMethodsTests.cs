@@ -1,4 +1,5 @@
-﻿using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
+﻿using System.Linq.Expressions;
+
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units.Models;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units;
@@ -6,64 +7,44 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units;
 public class HelperMethodsTests
 {
     [Fact]
-    public Task BuildSettersExpression_SingleProperty_GeneratesCorrectExpression()
+    public void WhereIf_TrueCondition_ReturnsFilteredQueryable()
     {
         // Arrange
-        var setters = new[]
+        var data = new List<TestEntityBase>
         {
-            ((Func<User, string>)(u => u.FirstName), "UpdatedFirstName")
-        };
+            new TestEntityBase(1, "Test1"),
+            new TestEntityBase(2, "Test2"),
+            new TestEntityBase(3, "Test3")
+        }.AsQueryable();
+
+        const bool condition = true;
+        Expression<Func<TestEntityBase, bool>> predicate = e => e.Name.Contains("Test");
 
         // Act
-        var expression = HelperMethods.BuildSettersExpression<User, string>(setters);
+        var result = data.WhereIf(condition, predicate);
 
-        // Assert - Verify will snapshot the expression tree
-        return Verify(expression);
+        // Assert
+        Assert.Equal(3, result.Count());
     }
 
     [Fact]
-    public Task BuildSettersExpression_MultipleProperties_GeneratesCorrectExpression()
+    public void WhereIf_FalseCondition_ReturnsUnfilteredQueryable()
     {
         // Arrange
-        var setters = new[]
+        var data = new List<TestEntityBase>
         {
-            ((Func<User, string>)(u => u.FirstName), "UpdatedFirstName"),
-            ((Func<User, string>)(u => u.LastName), "UpdatedLastName")
-        };
+            new TestEntityBase(1, "Test1"),
+            new TestEntityBase(2, "Test2"),
+            new TestEntityBase(3, "Test3")
+        }.AsQueryable();
+
+        const bool condition = false;
+        Expression<Func<TestEntityBase, bool>> predicate = e => e.Name.Contains("Test");
 
         // Act
-        var expression = HelperMethods.BuildSettersExpression<User, string>(setters);
+        var result = data.WhereIf(condition, predicate);
 
         // Assert
-        return Verify(expression);
-    }
-
-    [Fact]
-    public Task BuildSettersExpression_DifferentPropertyTypes_GeneratesCorrectExpression()
-    {
-        // Arrange
-        var setters = new[]
-        {
-            ((Func<User, DateTime>)(u => u.DateOfBirth), new DateTime(2000, 1, 1))
-        };
-
-        // Act
-        var expression = HelperMethods.BuildSettersExpression<User, DateTime>(setters);
-
-        // Assert
-        return Verify(expression);
-    }
-
-    [Fact]
-    public Task BuildSettersExpression_EmptySetters_ReturnsIdentityExpression()
-    {
-        // Arrange
-        var setters = Array.Empty<(Func<User, string> Selector, string Value)>();
-
-        // Act
-        var expression = HelperMethods.BuildSettersExpression<User, string>(setters);
-
-        // Assert
-        return Verify(expression);
+        Assert.Equal(3, result.Count());
     }
 }

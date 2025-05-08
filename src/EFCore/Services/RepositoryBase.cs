@@ -2,9 +2,7 @@
 using System.Linq.Expressions;
 
 using Microsoft.EntityFrameworkCore;
-
-using ZeidLab.ToolBox.EasyPersistence.Abstractions;
-using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
+using Microsoft.EntityFrameworkCore.Query;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
@@ -12,7 +10,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 [CLSCompliant(false)] // Mark the class as non-CLS-compliant
 [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
 public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEntityId>
-    where TEntity : Entity<TEntityId>, IAggregateRoot
+    where TEntity : EntityBase<TEntityId>, IAggregateRoot
     where TEntityId : notnull
 {
     private protected readonly DbContext _context;
@@ -94,21 +92,16 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
             .GetPagedResultsAsync(page, pageSize);
     }
 
-    public Task<int> UpdatePropertyAsync<TProperty>(
-        Expression<Func<TEntity, bool>> predicate,
-        params (Func<TEntity, TProperty> Selector, TProperty Value)[] setters)
+    public Task<int> InDbUpdatePropertyAsync(Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setters)
     {
-        // Build the Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>>
-        var settersExpression = HelperMethods
-            .BuildSettersExpression<TEntity, TProperty>(setters);
-
         // Execute the update with the dynamically built expression
         return _context.Set<TEntity>()
             .Where(predicate)
-            .ExecuteUpdateAsync(settersExpression);
+            .ExecuteUpdateAsync(setters);
     }
 
-    public Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate)
+    public Task<int> InDbDeleteAsync(Expression<Func<TEntity, bool>> predicate)
     {
         return _context.Set<TEntity>()
             .Where(predicate)

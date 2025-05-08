@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
+using Microsoft.EntityFrameworkCore.Query;
+
 // ReSharper disable once CheckNamespace
-namespace ZeidLab.ToolBox.EasyPersistence.Abstractions;
+namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
 [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
 public interface IRepositoryBase<TEntity, in TEntityId>
-    where TEntity : Entity<TEntityId>, IAggregateRoot
+    where TEntity : EntityBase<TEntityId>, IAggregateRoot
     where TEntityId : notnull
 {
     Task<TEntity?> GetByIdAsync(TEntityId entityId);
@@ -33,9 +35,9 @@ public interface IRepositoryBase<TEntity, in TEntityId>
         int page = 0, int pageSize = 10, params string[] fieldsToSearch);
 
     // Batch update properties without retrieving entities
-    Task<int> UpdatePropertyAsync<TProperty>(Expression<Func<TEntity, bool>> predicate,
-        params (Func<TEntity, TProperty> Selector, TProperty Value)[] setters);
+    Task<int> InDbUpdatePropertyAsync(Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setters);
 
     // Batch delete entities matching a predicate without retrieving them
-    Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<int> InDbDeleteAsync(Expression<Func<TEntity, bool>> predicate);
 }

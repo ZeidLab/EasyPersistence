@@ -1,8 +1,6 @@
-﻿using ZeidLab.ToolBox.EasyPersistence.Abstractions;
+﻿namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units.Models;
 
-namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units.Models;
-
-public sealed class User : Entity<Guid>, IAggregateRoot
+public sealed class User : EntityBase<Guid>, IAggregateRoot
 {
     // EF Core requires a parameterless constructor for EF Core to create instances of the entity
     private User() 

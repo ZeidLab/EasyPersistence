@@ -1,1 +1,0 @@
-﻿s => s.SetProperty(value(System.Func`2[ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units.Models.User,System.String]), e => "UpdatedFirstName")

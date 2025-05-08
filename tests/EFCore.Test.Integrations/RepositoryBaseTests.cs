@@ -5,7 +5,6 @@ using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-using ZeidLab.ToolBox.EasyPersistence.Abstractions;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.DTOs;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Interfaces;
@@ -221,7 +220,7 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var result = await testUnitOfWork.Users.FuzzySearchAsync("Clark",  0, 10, nameof(User.LastName));
+        var result = await testUnitOfWork.Users.FuzzySearchAsync("Clark", 0, 10, nameof(User.LastName));
 
         // Assert
         result.Items.Count.Should().Be(2);
@@ -270,14 +269,14 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync(
+        var updatedRows = await testUnitOfWork.Users.InDbUpdatePropertyAsync(
             u => u.LastName == "Smith",
-            (u => u.LastName, "Smith-Updated")
+            setter => setter.SetProperty(x => x.LastName, "Smith-Updated")
         );
 
         // Assert
         updatedRows.Should().Be(2); // Two rows should be updated
-        
+
         // Verify update in database
         var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith-Updated");
         updatedUsers.Count.Should().Be(2);
@@ -303,15 +302,15 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<string>(
-            u => u.LastName == "Smith",
-            (u => u.FirstName, "Updated-FirstName"),
-            (u => u.LastName, "Updated-LastName")
+        var updatedRows = await testUnitOfWork.Users.InDbUpdatePropertyAsync(
+            u => u.LastName == "Smith", setters => setters
+                .SetProperty(x => x.LastName, "Smith-Updated")
+                .SetProperty(x => x.FirstName, "Updated-FirstName")
         );
 
         // Assert
         updatedRows.Should().Be(2); // Two rows should be updated
-        
+
         // Verify update in database
         var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Updated-LastName");
         updatedUsers.Count.Should().Be(2);
@@ -338,16 +337,17 @@ public class RepositoryBaseTests : IAsyncLifetime
         var newDate = new DateTime(2000, 1, 1);
 
         // Act
-        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<DateTime>(
-            u => u.LastName == "Smith",
-            (u => u.DateOfBirth, newDate)
+        var updatedRows = await testUnitOfWork.Users.InDbUpdatePropertyAsync(
+            u => u.LastName == "Smith", setters
+                => setters.SetProperty(u => u.DateOfBirth, newDate)
         );
 
         // Assert
         updatedRows.Should().Be(2); // Two rows should be updated
-        
+
         // Verify update in database
-        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith");
+        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u
+            => u.LastName == "Smith");
         updatedUsers.Count.Should().Be(2);
         updatedUsers.All(u => u.DateOfBirth == newDate).Should().BeTrue();
     }
@@ -370,9 +370,9 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var updatedRows = await testUnitOfWork.Users.UpdatePropertyAsync<string>(
-            u => u.LastName == "NonExistent",
-            (u => u.FirstName, "Updated")
+        var updatedRows = await testUnitOfWork.Users.InDbUpdatePropertyAsync(
+            u => u.LastName == "NonExistent", setters
+                => setters.SetProperty(u => u.FirstName, "Updated")
         );
 
         // Assert

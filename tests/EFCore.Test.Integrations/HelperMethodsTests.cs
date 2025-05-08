@@ -5,8 +5,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-using ZeidLab.ToolBox.EasyPersistence.Abstractions;
-using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Interfaces;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
