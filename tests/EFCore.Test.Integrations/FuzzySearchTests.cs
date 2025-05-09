@@ -28,7 +28,7 @@ public sealed class FuzzySearchTests: IAsyncLifetime
         });
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
-        services.AddEfCoreSqlClrMethods();
+        services.AddEFCoreSqlClrMethods(useBackgroundService: false);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -54,6 +54,7 @@ public sealed class FuzzySearchTests: IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();
+        await _serviceProvider.InitializeSqlClrAsync();
     }
 
     public async Task DisposeAsync()
