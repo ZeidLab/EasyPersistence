@@ -1,68 +1,98 @@
 using System;
 using System.IO;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
 {
     /// <summary>
-    /// Extension methods for SQL CLR integration.
+    /// Helper methods for SQL CLR integration.
     /// </summary>
-    internal static class SqlClrExtensions
+    internal static class SqlClrHelper
     {
         /// <summary>
         /// Deploys a SQL CLR assembly to the database.
         /// </summary>
         /// <param name="context">The database context.</param>
-        /// <param name="assemblyPath">Path to the SQL CLR assembly file.</param>
         /// <param name="assemblyName">Name of the assembly in SQL Server.</param>
         /// <param name="permissionSet">Permission set for the assembly (SAFE, EXTERNAL_ACCESS, or UNSAFE).</param>
-        internal static void DeploySqlClrAssembly(
+        public static void DeploySqlClrAssembly(
             this DbContext context,
-            string assemblyPath,
             string assemblyName,
             string permissionSet = "SAFE")
         {
-            ArgumentNullException.ThrowIfNull(context);
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
 
-            if (string.IsNullOrWhiteSpace(assemblyPath))
-                throw new ArgumentException("Assembly path cannot be null or empty", nameof(assemblyPath));
-
-            if (string.IsNullOrWhiteSpace(assemblyName))
-                throw new ArgumentException("Assembly name cannot be null or empty", nameof(assemblyName));
+            const string assemblyPath = "sqlclr/EasyPersistence.EFCoreSqlClr.dll";
 
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException($"Assembly file not found at path: {assemblyPath}");
 
             // First, ensure CLR is enabled
-            const string enableClrSql
-                = """
-                    IF NOT EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr enabled' AND value_in_use = 1)
-                    BEGIN
-                        EXEC sp_configure 'show advanced options', 1;
-                        RECONFIGURE;
-                        EXEC sp_configure 'clr enabled', 1;
-                        RECONFIGURE;
-                    END
-                  """;
+            const string enableClrSql = @"
+                IF NOT EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr enabled' AND value_in_use = 1)
+                BEGIN
+                    EXEC sp_configure 'show advanced options', 1;
+                    RECONFIGURE;
+                    EXEC sp_configure 'clr enabled', 1;
+                    RECONFIGURE;
+                END";
             context.Database.ExecuteSqlRaw(enableClrSql);
 
             var assemblyBytes = File.ReadAllBytes(assemblyPath);
             var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
 
-            FormattableString sql
-                = $"""
-
-                       IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
-                       BEGIN
-                           DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
-                           CREATE ASSEMBLY [{assemblyName}]
-                           FROM @assembly
-                           WITH PERMISSION_SET = {permissionSet};
-                       END
-                   """;
             // Deploy the assembly
-            context.Database.ExecuteSqlInterpolated(sql);
+            context.Database.ExecuteSqlInterpolated($@"
+                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+                BEGIN
+                    DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
+                    CREATE ASSEMBLY [{assemblyName}]
+                    FROM @assembly
+                    WITH PERMISSION_SET = {permissionSet};
+                END");
+        }
+
+        /// <summary>
+        /// Initializes the SQL CLR assembly in the database using DbContext.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static async Task InitializeSqlClrAsync(
+            this DbContext context,
+            CancellationToken cancellationToken = default)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            const string assemblyName = "EFCoreSqlClr";
+            var assemblyPath = Path.Combine(AppContext.BaseDirectory,  "EasyPersistence.EFCoreSqlClr.dll");
+
+            if (!File.Exists(assemblyPath))
+                throw new FileNotFoundException($"SQL CLR assembly not found at: {assemblyPath}");
+
+            byte[] assemblyBytes;
+            using (var fileStream = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                assemblyBytes = new byte[fileStream.Length];
+                var bytesRead = await fileStream.ReadAsync(assemblyBytes, cancellationToken).ConfigureAwait(false);
+
+                if (bytesRead != fileStream.Length)
+                    throw new IOException("Failed to read complete assembly file");
+            }
+
+            var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
+            await context.Database.ExecuteSqlInterpolatedAsync($@"
+                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+                BEGIN
+                    DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
+                    CREATE ASSEMBLY [{assemblyName}]
+                    FROM @assembly
+                    WITH PERMISSION_SET = SAFE;
+                END", cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -70,7 +100,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
         /// </summary>
         /// <param name="context">The database context.</param>
         /// <param name="assemblyName">Name of the assembly in SQL Server.</param>
-        internal static void RemoveSqlClrAssembly(
+        public static void RemoveSqlClrAssembly(
             this DbContext context,
             string assemblyName)
         {
@@ -79,14 +109,12 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
 
             if (string.IsNullOrWhiteSpace(assemblyName))
                 throw new ArgumentException("Assembly name cannot be null or empty", nameof(assemblyName));
-            FormattableString sql
-                = $"""
-                       IF EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
-                       BEGIN
-                           DROP ASSEMBLY [{assemblyName}];
-                       END
-                   """;
-            context.Database.ExecuteSqlInterpolated(sql);
+
+            context.Database.ExecuteSqlInterpolated($@"
+                IF EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+                BEGIN
+                    DROP ASSEMBLY [{assemblyName}];
+                END");
         }
     }
 }

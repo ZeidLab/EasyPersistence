@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Interfaces;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Repositories;
@@ -36,6 +37,10 @@ public sealed class FuzzySearchTests: IAsyncLifetime
     public async Task FuzzySearch_ValidInput_ReturnsExpectedResults()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        await dbContext.InitializeSqlClrAsync();
+
         var unitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
         var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
 
@@ -54,7 +59,6 @@ public sealed class FuzzySearchTests: IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();
-        await _serviceProvider.InitializeSqlClrAsync<TestDbContext>();
     }
 
     public async Task DisposeAsync()
