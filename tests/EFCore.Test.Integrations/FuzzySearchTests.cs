@@ -42,14 +42,14 @@ public sealed class FuzzySearchTests: IAsyncLifetime
         await dbContext.InitializeSqlClrAsync();
 
         var unitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
-        var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
+       // var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
 
         // Arrange
         var searchTerm = "John";
         var expectedCount = 2;
 
         // Act
-        var result = await usersRepository.FuzzySearchAsync(searchTerm, x => x.FirstName);
+        var result = await unitOfWork.Users.FuzzySearchAsync(searchTerm, x => x.FirstName);
 
         // Assert
         Assert.NotNull(result);

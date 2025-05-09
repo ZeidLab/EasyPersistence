@@ -67,12 +67,13 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
 
             await context.Database.ExecuteSqlRawAsync(sql, cancellationToken).ConfigureAwait(false);
 
-            // Optionally trust the assembly
-            const string trustAssemblySql = $@"
-                DECLARE @assemblyId INT = (SELECT assembly_id FROM sys.assemblies WHERE name = '{assemblyName}');
-                IF @assemblyId IS NOT NULL
+            // Calculate assembly hash and trust it
+            var trustAssemblySql = $@"
+                DECLARE @hash varbinary(64);
+                SELECT @hash = HASHBYTES('SHA2_512', 0x{assemblyHex});
+                IF NOT EXISTS (SELECT 1 FROM sys.trusted_assemblies WHERE hash = @hash)
                 BEGIN
-                    EXEC sp_add_trusted_assembly @assemblyId;
+                    EXEC sp_add_trusted_assembly @hash;
                 END";
             await context.Database.ExecuteSqlRawAsync(trustAssemblySql, cancellationToken).ConfigureAwait(false);
         }
