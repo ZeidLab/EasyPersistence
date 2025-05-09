@@ -75,21 +75,28 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
             .GetPagedResultsAsync(page, pageSize);
     }
 
-    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
+    public Task<PagedResult<TEntity>> SearchAsync(string searchTerm,
         Expression<Func<TEntity, bool>> predicate, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
         return _context.Set<TEntity>().Where(predicate)
-            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+            .ApplySearch(searchTerm, fieldsToSearch)
             .GetPagedResultsAsync(page, pageSize);
     }
 
-    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm, int page = 0, int pageSize = 10,
+    public Task<PagedResult<TEntity>> SearchAsync(string searchTerm, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch)
     {
         return _context.Set<TEntity>()
-            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+            .ApplySearch(searchTerm, fieldsToSearch)
             .GetPagedResultsAsync(page, pageSize);
+    }
+
+    public Task<List<TEntity>> FuzzySearchAsync(string searchTerm, params Expression<Func<TEntity, string>>[] fieldsToSearch)
+    {
+        return _context.Set<TEntity>()
+            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+            .ToListAsync();
     }
 
     public Task<int> InDbUpdatePropertyAsync(Expression<Func<TEntity, bool>> predicate,

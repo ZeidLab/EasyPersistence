@@ -134,7 +134,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 
         // Act
         var query = dbContext.Users.AsQueryable();
-        var result = await query.ApplyFuzzySearch("John", nameof(User.LastName))
+        var result = await query.ApplySearch("John", nameof(User.LastName))
             .ToListAsync();
 
         // Assert
@@ -160,7 +160,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 
         // Act
         var query = dbContext.Users.AsQueryable();
-        var result = await query.ApplyFuzzySearch("John", nameof(User.FirstName), nameof(User.LastName))
+        var result = await query.ApplySearch("John", nameof(User.FirstName), nameof(User.LastName))
             .ToListAsync();
 
         // Assert
@@ -185,7 +185,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 
         // Act
         var query = dbContext.Users.AsQueryable();
-        var result = await query.ApplyFuzzySearch("John", u => u.LastName)
+        var result = await query.ApplySearch("John", u => u.LastName)
             .ToListAsync();
 
         // Assert
@@ -211,7 +211,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 
         // Act
         var query = dbContext.Users.AsQueryable();
-        var result = await query.ApplyFuzzySearch("John", u => u.FirstName, u => u.LastName)
+        var result = await query.ApplySearch("John", u => u.FirstName, u => u.LastName)
             .ToListAsync();
 
         // Assert
@@ -232,7 +232,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
 
         // Act
         var query = dbContext.Users.AsQueryable();
-        var result = await query.ApplyFuzzySearch("", u => u.FirstName)
+        var result = await query.ApplySearch("", u => u.FirstName)
             .ToListAsync();
 
         // Assert
@@ -257,7 +257,7 @@ public sealed class HelperMethodsTests : IAsyncLifetime
         // Act - fuzzy search + paging
         var query = dbContext.Users.AsQueryable();
         var result = await query
-            .ApplyFuzzySearch("Smith", nameof(User.LastName))
+            .ApplySearch("Smith", nameof(User.LastName))
             .GetPagedResultsAsync(0, 5);
 
         // Assert

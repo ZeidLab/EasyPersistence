@@ -4,7 +4,9 @@
     <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
@@ -15,4 +17,23 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference the EfCoreSqlClr project -->
+    <ProjectReference Include="..\EfCoreSqlClr\EfCoreSqlClr.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildEfCoreSqlClr" BeforeTargets="Build">
+    <!-- Build EfCoreSqlClr in Release mode -->
+    <MSBuild Projects="..\EfCoreSqlClr\EfCoreSqlClr.csproj" Targets="Build" Properties="Configuration=Release" />
+  </Target>
+
+  <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
+    <!-- Copy the EfCoreSqlClr.dll to the output directory -->
+    <Copy SourceFiles="..\EfCoreSqlClr\bin\Release\EasyPersistence.EfCoreSqlClr.dll" DestinationFolder="$(OutputPath)" />
+    <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
+    <ItemGroup>
+      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\netstandard2.0\" />
+    </ItemGroup>
+  </Target>
 </Project>

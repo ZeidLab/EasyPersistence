@@ -27,12 +27,14 @@ public interface IRepositoryBase<TEntity, in TEntityId>
 
     public Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize);
 
-    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
+    public Task<PagedResult<TEntity>> SearchAsync(string searchTerm,
         Expression<Func<TEntity, bool>> predicate, int page = 0, int pageSize = 10,
         params string[] fieldsToSearch);
 
-    public Task<PagedResult<TEntity>> FuzzySearchAsync(string searchTerm,
+    public Task<PagedResult<TEntity>> SearchAsync(string searchTerm,
         int page = 0, int pageSize = 10, params string[] fieldsToSearch);
+
+    public Task<List<TEntity>> FuzzySearchAsync(string searchTerm, params Expression<Func<TEntity,string>>[] fieldsToSearch);
 
     // Batch update properties without retrieving entities
     Task<int> InDbUpdatePropertyAsync(Expression<Func<TEntity, bool>> predicate,

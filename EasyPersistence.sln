@@ -28,7 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHelpers", "tests\TestHe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore.Test.Integrations", "tests\EFCore.Test.Integrations\EFCore.Test.Integrations.csproj", "{B07431E6-AA29-403D-9443-4E0468DC5919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfCoreSqlClr", "src\EfCoreSqlClr\EfCoreSqlClr.csproj", "{4FDD45B2-E2BD-43FA-A3F3-D7CC6F1057E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreSqlClr", "src\EFCoreSqlClr\EFCoreSqlClr.csproj", "{4FDD45B2-E2BD-43FA-A3F3-D7CC6F1057E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

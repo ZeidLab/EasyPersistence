@@ -220,7 +220,7 @@ public class RepositoryBaseTests : IAsyncLifetime
         await testUnitOfWork.SaveChangesAsync();
 
         // Act
-        var result = await testUnitOfWork.Users.FuzzySearchAsync("Clark", 0, 10, nameof(User.LastName));
+        var result = await testUnitOfWork.Users.SearchAsync("Clark", 0, 10, nameof(User.LastName));
 
         // Assert
         result.Items.Count.Should().Be(2);

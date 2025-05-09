@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
@@ -18,7 +17,7 @@ public static class HelperMethods
         return new PagedResult<TEntity>(items, itemsCount);
     }
 
-    public static IQueryable<TEntity> ApplyFuzzySearch<TEntity>(
+    public static IQueryable<TEntity> ApplySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
         params string[] propertyNames)
@@ -76,7 +75,7 @@ public static class HelperMethods
         return query.Where(lambda);
     }
 
-    public static IQueryable<TEntity> ApplyFuzzySearch<TEntity>(
+    public static IQueryable<TEntity> ApplySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
         params Expression<Func<TEntity, string>>[] propertyExpressions)
@@ -156,6 +155,43 @@ public static class HelperMethods
         }
     }
 
+    public static IQueryable<TEntity> ApplyFuzzySearch<TEntity>(
+        this IQueryable<TEntity> query,
+        string searchTerm,
+        params Expression<Func<TEntity, string>>[] propertyNames)
+    {
+        if (string.IsNullOrEmpty(searchTerm) || propertyNames.Length == 0)
+            return query;
+
+        // Create a parameter for the entity
+        var parameter = Expression.Parameter(typeof(TEntity), "x");
+
+        // Build the FuzzySearch score expressions for each property
+        var scoreExpressions = propertyNames.Select(property =>
+        {
+            var propertyAccess = Expression.Invoke(property, parameter);
+            var fuzzySearchCall = Expression.Call(
+                typeof(HelperMethods),
+                nameof(FuzzySearch),
+                null,
+                Expression.Constant(searchTerm),
+                propertyAccess
+            );
+            return fuzzySearchCall;
+        }).ToArray();
+
+        // Combine the scores into a single expression (sum of scores)
+        var combinedScore = scoreExpressions
+            .Aggregate<Expression, Expression?>(null, (current, next) =>
+                current == null ? next : Expression.Add(current, next))!;
+        
+        // Create a lambda expression for the combined score
+        var scoreLambda = Expression.Lambda<Func<TEntity, int>>(combinedScore, parameter);
+
+        // Order the query by the combined score
+        return query.OrderBy(scoreLambda);
+    }
+
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IQueryable<T> WhereIf<T>(
@@ -164,5 +200,13 @@ public static class HelperMethods
         where T : notnull
     {
         return condition ? queryable.Where(predicate) : queryable;
+    }
+
+    [DbFunction("FuzzySearch")]
+    public static int FuzzySearch(string searchTerm, string comparedString)
+    {
+        // This is a placeholder for the actual implementation
+        // You would typically use this in a LINQ query or similar
+        return 0;
     }
 }
