@@ -13,52 +13,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
     internal static class SqlClrHelper
     {
         /// <summary>
-        /// Deploys a SQL CLR assembly to the database.
-        /// </summary>
-        /// <param name="context">The database context.</param>
-        /// <param name="assemblyName">Name of the assembly in SQL Server.</param>
-        /// <param name="permissionSet">Permission set for the assembly (SAFE, EXTERNAL_ACCESS, or UNSAFE).</param>
-        public static void DeploySqlClrAssembly(
-            this DbContext context,
-            string assemblyName,
-            string permissionSet = "SAFE")
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            const string assemblyPath = "EasyPersistence.EFCoreSqlClr.dll";
-
-            if (!File.Exists(assemblyPath))
-                throw new FileNotFoundException($"Assembly file not found at path: {assemblyPath}");
-
-            // First, ensure CLR is enabled
-            const string enableClrSql = @"
-                IF NOT EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr enabled' AND value_in_use = 1)
-                BEGIN
-                    EXEC sp_configure 'show advanced options', 1;
-                    RECONFIGURE;
-                    EXEC sp_configure 'clr enabled', 1;
-                    RECONFIGURE;
-                END";
-            context.Database.ExecuteSqlRaw(enableClrSql);
-
-            var assemblyBytes = File.ReadAllBytes(assemblyPath);
-            var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
-
-            // Deploy the assembly
-            var sql = $@"
-                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = '{assemblyName}')
-                BEGIN
-                    DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
-                    CREATE ASSEMBLY [{assemblyName}]
-                    FROM @assembly
-                    WITH PERMISSION_SET = {permissionSet};
-                END";
-
-            context.Database.ExecuteSqlRaw(sql);
-        }
-
-        /// <summary>
         /// Initializes the SQL CLR assembly in the database using DbContext.
         /// </summary>
         /// <param name="context">The database context.</param>
@@ -87,14 +41,19 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             }
 
             var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
-            // Check and disable clr strict security if necessary
-            const string disableClrStrictSecuritySql = @"
-                IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security' AND value_in_use = 1)
+            // First check if 'clr strict security' exists
+            const string checkConfigSql = @"
+                IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security')
                 BEGIN
-                    EXEC sp_configure 'clr strict security', 0;
-                    RECONFIGURE;
+                    IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security' AND value_in_use = 1)
+                    BEGIN
+                        EXEC sp_configure 'show advanced options', 1;
+                        RECONFIGURE;
+                        EXEC sp_configure 'clr strict security', 0;
+                        RECONFIGURE;
+                    END
                 END";
-            await context.Database.ExecuteSqlRawAsync(disableClrStrictSecuritySql, cancellationToken).ConfigureAwait(false);
+            await context.Database.ExecuteSqlRawAsync(checkConfigSql, cancellationToken).ConfigureAwait(false);
 
             // Deploy the assembly
             var sql = $@"
