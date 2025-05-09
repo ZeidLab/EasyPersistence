@@ -87,6 +87,16 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             }
 
             var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
+            // Check and disable clr strict security if necessary
+            const string disableClrStrictSecuritySql = @"
+                IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security' AND value_in_use = 1)
+                BEGIN
+                    EXEC sp_configure 'clr strict security', 0;
+                    RECONFIGURE;
+                END";
+            await context.Database.ExecuteSqlRawAsync(disableClrStrictSecuritySql, cancellationToken).ConfigureAwait(false);
+
+            // Deploy the assembly
             var sql = $@"
                 IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = '{assemblyName}')
                 BEGIN
@@ -97,6 +107,15 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
                 END";
 
             await context.Database.ExecuteSqlRawAsync(sql, cancellationToken).ConfigureAwait(false);
+
+            // Optionally trust the assembly
+            const string trustAssemblySql = $@"
+                DECLARE @assemblyId INT = (SELECT assembly_id FROM sys.assemblies WHERE name = '{assemblyName}');
+                IF @assemblyId IS NOT NULL
+                BEGIN
+                    EXEC sp_add_trusted_assembly @assemblyId;
+                END";
+            await context.Database.ExecuteSqlRawAsync(trustAssemblySql, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
