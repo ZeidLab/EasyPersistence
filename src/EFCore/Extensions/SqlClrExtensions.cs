@@ -26,7 +26,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            const string assemblyPath = "sqlclr/EasyPersistence.EFCoreSqlClr.dll";
+            const string assemblyPath = "EasyPersistence.EFCoreSqlClr.dll";
 
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException($"Assembly file not found at path: {assemblyPath}");
@@ -46,14 +46,16 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
 
             // Deploy the assembly
-            context.Database.ExecuteSqlInterpolated($@"
-                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+            var sql = $@"
+                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = '{assemblyName}')
                 BEGIN
                     DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
                     CREATE ASSEMBLY [{assemblyName}]
                     FROM @assembly
                     WITH PERMISSION_SET = {permissionSet};
-                END");
+                END";
+
+            context.Database.ExecuteSqlRaw(sql);
         }
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
                 throw new ArgumentNullException(nameof(context));
 
             const string assemblyName = "EFCoreSqlClr";
-            var assemblyPath = Path.Combine(AppContext.BaseDirectory,  "EasyPersistence.EFCoreSqlClr.dll");
+            var assemblyPath = Path.Combine(AppContext.BaseDirectory, "EasyPersistence.EFCoreSqlClr.dll");
 
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException($"SQL CLR assembly not found at: {assemblyPath}");
@@ -85,14 +87,16 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             }
 
             var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
-            await context.Database.ExecuteSqlInterpolatedAsync($@"
-                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+            var sql = $@"
+                IF NOT EXISTS (SELECT 1 FROM sys.assemblies WHERE name = '{assemblyName}')
                 BEGIN
                     DECLARE @assembly VARBINARY(MAX) = 0x{assemblyHex};
                     CREATE ASSEMBLY [{assemblyName}]
                     FROM @assembly
                     WITH PERMISSION_SET = SAFE;
-                END", cancellationToken).ConfigureAwait(false);
+                END";
+
+            await context.Database.ExecuteSqlRawAsync(sql, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -110,11 +114,13 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
             if (string.IsNullOrWhiteSpace(assemblyName))
                 throw new ArgumentException("Assembly name cannot be null or empty", nameof(assemblyName));
 
-            context.Database.ExecuteSqlInterpolated($@"
-                IF EXISTS (SELECT 1 FROM sys.assemblies WHERE name = {assemblyName})
+            var sql = $@"
+                IF EXISTS (SELECT 1 FROM sys.assemblies WHERE name = '{assemblyName}')
                 BEGIN
                     DROP ASSEMBLY [{assemblyName}];
-                END");
+                END";
+
+            context.Database.ExecuteSqlRaw(sql);
         }
     }
 }
