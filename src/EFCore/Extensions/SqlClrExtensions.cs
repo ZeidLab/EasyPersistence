@@ -1,9 +1,4 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
 {
@@ -76,6 +71,23 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
                     EXEC sp_add_trusted_assembly @hash;
                 END";
             await context.Database.ExecuteSqlRawAsync(trustAssemblySql, cancellationToken).ConfigureAwait(false);
+
+            // Create the FuzzySearch function that maps to the CLR method
+            const string createFunctionSql = @"
+                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FuzzySearch]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+                BEGIN
+                    EXEC sp_executesql N'
+                    CREATE FUNCTION [dbo].[FuzzySearch]
+                    (
+                        @searchTerm NVARCHAR(MAX),
+                        @comparedString NVARCHAR(MAX)
+                    )
+                    RETURNS FLOAT
+                    AS EXTERNAL NAME [EFCoreSqlClr].[ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.SqlClrFunctions].[FuzzySearch]
+                    ';
+                END";
+
+            await context.Database.ExecuteSqlRawAsync(createFunctionSql, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

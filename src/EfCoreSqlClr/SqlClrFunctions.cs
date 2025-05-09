@@ -7,7 +7,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EfCoreSqlClr;
 public static class SqlClrFunctions
 {
     [SqlFunction]
-    public static SqlInt32 FuzzySearch(SqlString searchTerm, SqlString comparedString)
+    public static SqlDouble FuzzySearch(SqlString searchTerm, SqlString comparedString)
     {
         return 0;
     }
