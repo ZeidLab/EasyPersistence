@@ -20,16 +20,17 @@ public static class EFCoreDependencyInjection
         {
             services.AddHostedService<BackgroundEFCoreSqlClrInstallerService>();
         }
-
+        
         return services;
     }
 
-    public static async Task InitializeSqlClrAsync(
+    public static async Task InitializeSqlClrAsync<TContext>(
         this IServiceProvider serviceProvider,
         CancellationToken cancellationToken = default)
+        where TContext : DbContext
     {
         using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
         const string assemblyName = "EFCoreSqlClr";
         var assemblyPath = Path.Combine(AppContext.BaseDirectory, "EasyPersistence.EFCoreSqlClr.dll");

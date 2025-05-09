@@ -40,12 +40,35 @@ internal sealed class BackgroundEFCoreSqlClrInstallerService : IHostedService
                 var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
 
                 const string assemblyName = "EFCoreSqlClr";
-                var assemblyPath = Path.Combine(AppContext.BaseDirectory, "EasyPersistence.EFCoreSqlClr.dll");
+                const string assemblyFileName = "EasyPersistence.EFCoreSqlClr.dll";
 
-                if (!File.Exists(assemblyPath))
+                // Try multiple possible locations
+                var possiblePaths = new[]
                 {
-                    _logger.LogWarning("SQL CLR assembly file not found at '{AssemblyPath}'. Retrying in {Delay}ms...", 
-                        assemblyPath, retryDelayMs);
+                    Path.Combine(AppContext.BaseDirectory, assemblyFileName),
+                    Path.Combine(AppContext.BaseDirectory, "sqlclr", assemblyFileName),
+                    Path.Combine(AppContext.BaseDirectory, "..", "sqlclr", assemblyFileName),
+                    Path.Combine(AppContext.BaseDirectory, "..", "bin", "sqlclr", assemblyFileName)
+                };
+
+                var assemblyPath = possiblePaths.FirstOrDefault(File.Exists);
+
+                if (assemblyPath == null)
+                {
+                    _logger.LogWarning("SQL CLR assembly file not found in any of the expected locations. Retrying in {Delay}ms...", retryDelayMs);
+                    await Task.Delay(retryDelayMs, cancellationToken).ConfigureAwait(false);
+                    continue;
+                }
+
+                // Try to open file with just read access
+                try
+                {
+                    using var fileStream = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    // If we can open it, it's not locked
+                }
+                catch (IOException ex)
+                {
+                    _logger.LogWarning(ex, "SQL CLR assembly file is locked. Retrying in {Delay}ms...", retryDelayMs);
                     await Task.Delay(retryDelayMs, cancellationToken).ConfigureAwait(false);
                     continue;
                 }

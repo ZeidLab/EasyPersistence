@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <SqlClrOutputPath>$(MSBuildThisFileDirectory)..\bin\sqlclr</SqlClrOutputPath>
+    </PropertyGroup>
+
+    <Target Name="CopySqlClrToSharedLocation" AfterTargets="Build">
+        <PropertyGroup>
+            <SourceFile>$(TargetPath)</SourceFile>
+            <DestinationFile>$(SqlClrOutputPath)\$(TargetFileName)</DestinationFile>
+        </PropertyGroup>
+        
+        <MakeDir Directories="$(SqlClrOutputPath)" />
+        <Copy SourceFiles="$(SourceFile)" 
+              DestinationFiles="$(DestinationFile)"
+              SkipUnchangedFiles="true"
+              UseHardlinksIfPossible="true" />
+    </Target>
+</Project>

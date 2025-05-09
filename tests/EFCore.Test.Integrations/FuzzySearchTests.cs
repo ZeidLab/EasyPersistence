@@ -54,7 +54,7 @@ public sealed class FuzzySearchTests: IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();
-        await _serviceProvider.InitializeSqlClrAsync();
+        await _serviceProvider.InitializeSqlClrAsync<TestDbContext>();
     }
 
     public async Task DisposeAsync()
