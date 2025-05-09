@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
@@ -14,5 +16,6 @@ public class TestDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TestDbContext).Assembly);
+        modelBuilder.RegisterSqlClrMethods();
     }
 }

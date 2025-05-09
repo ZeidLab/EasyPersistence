@@ -29,8 +29,16 @@
   </Target>
 
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
-    <!-- Copy the EfCoreSqlClr.dll to the output directory -->
-    <Copy SourceFiles="..\EfCoreSqlClr\bin\Release\EasyPersistence.EfCoreSqlClr.dll" DestinationFolder="$(OutputPath)" />
+    <!-- Copy the EfCoreSqlClr.dll to the output directory with retry logic -->
+    <Copy
+      SourceFiles="..\EfCoreSqlClr\bin\Release\EasyPersistence.EfCoreSqlClr.dll"
+      DestinationFolder="$(OutputPath)"
+      SkipUnchangedFiles="true"
+      ContinueOnError="true"
+      RetryDelayMilliseconds="500"
+      Retries="5">
+    </Copy>
+
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
       <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\netstandard2.0\" />
