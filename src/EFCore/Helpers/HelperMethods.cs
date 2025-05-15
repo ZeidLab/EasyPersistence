@@ -173,7 +173,7 @@ public static class HelperMethods
             var propertyPath = GetPropertyPath(propExpr);
             var visitor = new ParameterReplacer(propExpr.Parameters[0], entityParameter);
             var propertyAccess = visitor.Visit(propExpr.Body);
-            
+
             return Expression.MemberInit(
                 Expression.New(typeof(PropertyScore)),
                 Expression.Bind(
@@ -193,16 +193,38 @@ public static class HelperMethods
 
         // Create an array of PropertyScore expressions
         var scoresArrayExpr = Expression.NewArrayInit(typeof(PropertyScore), propertyScores);
-        
+
         // Calculate average score
+        var selectorParam = Expression.Parameter(typeof(PropertyScore), "x");
+        var selectorExpr = Expression.Lambda<Func<PropertyScore, double>>(
+            Expression.Property(selectorParam, nameof(PropertyScore.Score)),
+            selectorParam
+        );
+
+#pragma warning disable S1481
+        var SecoundAvrageMethod = typeof(Enumerable)
+            .GetMethods()
+            .Where(x => string.Equals(x.Name, nameof(Enumerable.Average), StringComparison.Ordinal))
+            .Where(x => x.ReturnType == typeof(double))
+            .LastOrDefault(m => m.GetParameters().Length == 2 &&
+                                m.GetParameters()[0].ParameterType.IsGenericType &&
+                                m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+                                m.GetParameters()[1].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>))!
+            .MakeGenericMethod(typeof(PropertyScore));
+
+        
+        var averageMethod = typeof(Enumerable).GetMethods()
+            .First(m => string.Equals(m.Name, nameof(Enumerable.Average)) &&
+                       m.GetParameters().Length == 2 &&
+                       m.GetParameters()[1].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>) &&
+                       m.ReturnType == typeof(double))
+            .MakeGenericMethod(typeof(PropertyScore));
+#pragma warning restore S1481
+
         var avgScoreExpr = Expression.Call(
-            typeof(Enumerable).GetMethod(nameof(Enumerable.Average), new[] { typeof(PropertyScore) })!
-                .MakeGenericMethod(typeof(PropertyScore)),
+            SecoundAvrageMethod,
             scoresArrayExpr,
-            Expression.Lambda<Func<PropertyScore, double>>(
-                Expression.Property(Expression.Parameter(typeof(PropertyScore), "x"), nameof(PropertyScore.Score)),
-                Expression.Parameter(typeof(PropertyScore), "x")
-            )
+            selectorExpr
         );
 
         // Create final select expression
@@ -245,7 +267,6 @@ public static class HelperMethods
         return string.Join(".", path);
     }
 
-   
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
