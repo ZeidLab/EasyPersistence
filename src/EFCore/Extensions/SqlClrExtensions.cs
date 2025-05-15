@@ -18,7 +18,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
-
             const string assemblyName = "EFCoreSqlClr";
             var assemblyPath = Path.Combine(AppContext.BaseDirectory, "EasyPersistence.EFCoreSqlClr.dll");
 
@@ -35,15 +34,16 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
                     throw new IOException("Failed to read complete assembly file");
             }
 
-            var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");
-            // First check if 'clr strict security' exists
+            var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");            // First enable CLR and set clr strict security to 0
             const string checkConfigSql = @"
+                EXEC sp_configure 'show advanced options', 1;
+                RECONFIGURE;
+                EXEC sp_configure 'clr enabled', 1;
+                RECONFIGURE;
                 IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security')
                 BEGIN
                     IF EXISTS (SELECT 1 FROM sys.configurations WHERE name = 'clr strict security' AND value_in_use = 1)
                     BEGIN
-                        EXEC sp_configure 'show advanced options', 1;
-                        RECONFIGURE;
                         EXEC sp_configure 'clr strict security', 0;
                         RECONFIGURE;
                     END

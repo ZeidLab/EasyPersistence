@@ -155,41 +155,50 @@ public static class HelperMethods
         }
     }
 
-    public static IQueryable<TEntity> ApplyFuzzySearch<TEntity>(
+    public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
-        params Expression<Func<TEntity, string>>[] propertyNames)
+        params Expression<Func<TEntity, string>>[] propertyExpressions)
     {
-        if (string.IsNullOrEmpty(searchTerm) || propertyNames.Length == 0)
-            return query;
+        if (string.IsNullOrEmpty(searchTerm) || propertyExpressions.Length == 0)
+            return query.Select(x => new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = null });
 
-        // Create a parameter for the entity
-        var parameter = Expression.Parameter(typeof(TEntity), "x");
+        return query.Select(entity => new
+            {
+                Entity = entity,
+                Scores = propertyExpressions.ToDictionary(
+                    property => GetPropertyPath(property),
+                    property => FuzzySearch(searchTerm, BuildPropertyAccessExpression(entity, property))
+                )
+            })
+            .Select(records => new ScoredRecord<TEntity>
+            {
+                Entity = records.Entity,
+                Score = records.Scores.Values.Average(),
+                Scores = records.Scores,
+            });
+    }
 
-        // Build the FuzzySearch score expressions for each property
-        var scoreExpressions = propertyNames.Select(property =>
+    private static string GetPropertyPath<TEntity>(Expression<Func<TEntity, string>> propertyExpression)
+    {
+        var memberExpression = propertyExpression.Body as MemberExpression;
+        var path = new List<string>();
+
+        while (memberExpression != null)
         {
-            var propertyAccess = Expression.Invoke(property, parameter);
-            var fuzzySearchCall = Expression.Call(
-                typeof(HelperMethods),
-                nameof(FuzzySearch),
-                null,
-                Expression.Constant(searchTerm),
-                propertyAccess
-            );
-            return fuzzySearchCall;
-        }).ToArray();
+            path.Insert(0, memberExpression.Member.Name);
+            memberExpression = memberExpression.Expression as MemberExpression;
+        }
 
-        // Combine the scores into a single expression (sum of scores)
-        var combinedScore = scoreExpressions
-            .Aggregate<Expression, Expression?>(null, (current, next) =>
-                current == null ? next : Expression.Add(current, next))!;
-        
-        // Create a lambda expression for the combined score
-        var scoreLambda = Expression.Lambda<Func<TEntity, int>>(combinedScore, parameter);
+        return string.Join(".", path);
+    }
 
-        // Order the query by the combined score
-        return query.OrderBy(scoreLambda);
+    private static string BuildPropertyAccessExpression<TEntity>(
+        TEntity entity,
+        Expression<Func<TEntity, string>> propertyExpression)
+    {
+        var propertyPath = GetPropertyPath(propertyExpression);
+        return EF.Property<string>(entity!, propertyPath);
     }
 
     [Pure]
@@ -202,8 +211,8 @@ public static class HelperMethods
         return condition ? queryable.Where(predicate) : queryable;
     }
 
-    [DbFunction("FuzzySearch")]
-    public static int FuzzySearch(string searchTerm, string comparedString)
+    [DbFunction("FuzzySearch", schema: "dbo")]
+    public static double FuzzySearch(string searchTerm, string comparedString)
     {
         // This is a placeholder for the actual implementation
         // You would typically use this in a LINQ query or similar

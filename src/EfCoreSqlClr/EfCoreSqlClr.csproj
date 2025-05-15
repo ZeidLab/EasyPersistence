@@ -7,10 +7,9 @@
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{4FDD45B2-E2BD-43FA-A3F3-D7CC6F1057E9}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <AppDesignerFolder>Properties</AppDesignerFolder>        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>EfCoreSqlClr.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>EFCoreSqlClr.snk</AssemblyOriginatorKeyFile>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -43,9 +42,7 @@
         <Compile Include="SqlClrFunctions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" />
-    </ItemGroup>
+  
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Import Project="PostBuild.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

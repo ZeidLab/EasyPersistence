@@ -92,7 +92,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
             .GetPagedResultsAsync(page, pageSize);
     }
 
-    public Task<List<TEntity>> FuzzySearchAsync(string searchTerm, params Expression<Func<TEntity, string>>[] fieldsToSearch)
+    public Task<List<ScoredRecord<TEntity>>> FuzzySearchAsync(string searchTerm, params Expression<Func<TEntity, string>>[] fieldsToSearch)
     {
         return _context.Set<TEntity>()
             .ApplyFuzzySearch(searchTerm, fieldsToSearch)

@@ -25,15 +25,14 @@ public static class EFCoreDependencyInjection
     }
 
     public static ModelBuilder RegisterSqlClrMethods(
-        this ModelBuilder modelBuilder,
-        string schemaName = "dbo")
+        this ModelBuilder modelBuilder )
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
         modelBuilder.HasDbFunction(typeof(HelperMethods).GetMethod(nameof(HelperMethods.FuzzySearch),
                 [typeof(string), typeof(string)]) ?? throw new InvalidOperationException())
             .HasName("FuzzySearch")
-            .HasSchema(schemaName);  // Adjust schema if needed 
+            .HasSchema("dbo");
 
         return modelBuilder;
     }

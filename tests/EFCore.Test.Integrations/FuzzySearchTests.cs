@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Interfaces;
+using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Repositories;
 using ZeidLab.ToolBox.EasyPersistence.TestHelpers;
 
@@ -13,7 +14,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations;
 
 [SuppressMessage("ConfigureAwait", "ConfigureAwaitEnforcer:ConfigureAwaitEnforcer")]
 [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]
-public sealed class FuzzySearchTests: IAsyncLifetime
+public sealed class FuzzySearchTests : IAsyncLifetime
 {
     private readonly ServiceProvider _serviceProvider;
     private readonly TestDbGenerator _dbGenerator = TestDbGenerator.GenerateSqlServerOnly();
@@ -42,14 +43,24 @@ public sealed class FuzzySearchTests: IAsyncLifetime
         await dbContext.InitializeSqlClrAsync();
 
         var unitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
-       // var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
+        // var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
 
         // Arrange
         var searchTerm = "John";
         var expectedCount = 2;
 
+        var users = new List<User>
+        {
+            User.Create("John", "Smith", "john.smith@example.com", new DateTime(1990, 1, 1)),
+            User.Create("Jane", "Smith", "jane.smith@example.com", new DateTime(1992, 3, 15))
+        };
+        unitOfWork.Users.AddRange(users);
+        await unitOfWork.SaveChangesAsync();
+
         // Act
-        var result = await unitOfWork.Users.FuzzySearchAsync(searchTerm, x => x.FirstName);
+        var result = await unitOfWork.Users
+            .FuzzySearchAsync(searchTerm,
+                x => x.FirstName);
 
         // Assert
         Assert.NotNull(result);
