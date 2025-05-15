@@ -1,17 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 using ZeidLab.ToolBox.EasyPersistence.EFCore;
-using ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
+// ReSharper disable once InconsistentNaming
 public static class EFCoreDependencyInjection
 {
+    // ReSharper disable once InconsistentNaming
     public static IServiceCollection AddEFCoreSqlClrMethods(
         this IServiceCollection services,
         bool useBackgroundService = true)

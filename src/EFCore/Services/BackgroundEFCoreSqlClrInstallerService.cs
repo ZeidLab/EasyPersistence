@@ -1,17 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions;
-
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
+// ReSharper disable once InconsistentNaming
 internal sealed class BackgroundEFCoreSqlClrInstallerService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -86,14 +81,14 @@ internal sealed class BackgroundEFCoreSqlClrInstallerService : IHostedService
                     try
                     {
                         _logger.LogInformation("SQL CLR assembly '{AssemblyName}' is not registered. Registering now...", assemblyName);
-                        
+
                         // Read file with FileShare.ReadWrite to allow other processes to access it
                         byte[] assemblyBytes;
                         using (var fileStream = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         {
                             assemblyBytes = new byte[fileStream.Length];
                             var bytesRead = await fileStream.ReadAsync(assemblyBytes, cancellationToken).ConfigureAwait(false);
-                            
+
                             if (bytesRead != fileStream.Length)
                                 throw new IOException("Failed to read complete assembly file");
                         }

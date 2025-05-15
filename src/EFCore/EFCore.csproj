@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-
-    <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
@@ -20,12 +20,12 @@
 
   <ItemGroup>
     <!-- Reference the EfCoreSqlClr project -->
-    <ProjectReference Include="..\EfCoreSqlClr\EfCoreSqlClr.csproj" />
+    <ProjectReference Include="..\EfCoreSqlClr\EfCoreSqlClr.csproj"/>
   </ItemGroup>
 
   <Target Name="BuildEfCoreSqlClr" BeforeTargets="Build">
     <!-- Build EfCoreSqlClr in Release mode -->
-    <MSBuild Projects="..\EfCoreSqlClr\EfCoreSqlClr.csproj" Targets="Build" Properties="Configuration=Release" />
+    <MSBuild Projects="..\EfCoreSqlClr\EfCoreSqlClr.csproj" Targets="Build" Properties="Configuration=Release"/>
   </Target>
 
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
@@ -41,7 +41,7 @@
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
-      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\netstandard2.0\" />
+      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\netstandard2.0\"/>
     </ItemGroup>
   </Target>
 </Project>

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Extensions
+// ReSharper disable once CheckNamespace
+namespace ZeidLab.ToolBox.EasyPersistence.EFCore
 {
     /// <summary>
     /// Helper methods for SQL CLR integration.
