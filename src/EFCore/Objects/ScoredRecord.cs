@@ -9,11 +9,16 @@ public sealed class ScoredRecord<TEntity>
 
     public required double Score { get; set; }
 
-    public IEnumerable<PropertyScore>? Scores { get; set; }
+    public IEnumerable<PropertyScore> Scores { get; set; } = Enumerable.Empty<PropertyScore>();
 }
 
 public sealed class PropertyScore
 {
-    public string Name { get; set; }
+    public PropertyScore()
+    {
+        Name = string.Empty;
+    }
+    
+    public required string Name { get; set; }
     public double Score { get; set; }
 }

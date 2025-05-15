@@ -161,26 +161,74 @@ public static class HelperMethods
         params Expression<Func<TEntity, string>>[] propertyExpressions)
     {
         if (string.IsNullOrEmpty(searchTerm) || propertyExpressions.Length == 0)
-            return query.Select(x => new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = null });
+            return query.Select(x => new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = Enumerable.Empty<PropertyScore>() });
 
-        var paths = propertyExpressions.Select(GetPropertyPath).ToList();
-        
-        return query.Select(entity => new
-            {
-                Entity = entity,
-                Scores = paths.Select(
-                    property => new PropertyScore {
-                        Name = property,
-                        Score = FuzzySearch(searchTerm, EF.Property<string>(entity!, property))
-                    }
+        // Create the parameter for our entity
+        var entityParameter = Expression.Parameter(typeof(TEntity), "entity");
+        var searchTermConstant = Expression.Constant(searchTerm);
+
+        // Build up expressions for each property
+        var propertyScores = propertyExpressions.Select(propExpr =>
+        {
+            var propertyPath = GetPropertyPath(propExpr);
+            var visitor = new ParameterReplacer(propExpr.Parameters[0], entityParameter);
+            var propertyAccess = visitor.Visit(propExpr.Body);
+            
+            return Expression.MemberInit(
+                Expression.New(typeof(PropertyScore)),
+                Expression.Bind(
+                    typeof(PropertyScore).GetProperty(nameof(PropertyScore.Name))!,
+                    Expression.Constant(propertyPath)
                 ),
-            })
-            .Select(records => new ScoredRecord<TEntity>
-            {
-                Entity = records.Entity,
-                Score = records.Scores.Average(x => x.Score),
-                Scores = records.Scores,
-            });
+                Expression.Bind(
+                    typeof(PropertyScore).GetProperty(nameof(PropertyScore.Score))!,
+                    Expression.Call(
+                        typeof(HelperMethods).GetMethod(nameof(FuzzySearch))!,
+                        searchTermConstant,
+                        propertyAccess
+                    )
+                )
+            );
+        }).ToList();
+
+        // Create an array of PropertyScore expressions
+        var scoresArrayExpr = Expression.NewArrayInit(typeof(PropertyScore), propertyScores);
+        
+        // Calculate average score
+        var avgScoreExpr = Expression.Call(
+            typeof(Enumerable).GetMethod(nameof(Enumerable.Average), new[] { typeof(PropertyScore) })!
+                .MakeGenericMethod(typeof(PropertyScore)),
+            scoresArrayExpr,
+            Expression.Lambda<Func<PropertyScore, double>>(
+                Expression.Property(Expression.Parameter(typeof(PropertyScore), "x"), nameof(PropertyScore.Score)),
+                Expression.Parameter(typeof(PropertyScore), "x")
+            )
+        );
+
+        // Create final select expression
+        var selectExpr = Expression.MemberInit(
+            Expression.New(typeof(ScoredRecord<TEntity>)),
+            Expression.Bind(
+                typeof(ScoredRecord<TEntity>).GetProperty(nameof(ScoredRecord<TEntity>.Entity))!,
+                entityParameter
+            ),
+            Expression.Bind(
+                typeof(ScoredRecord<TEntity>).GetProperty(nameof(ScoredRecord<TEntity>.Score))!,
+                avgScoreExpr
+            ),
+            Expression.Bind(
+                typeof(ScoredRecord<TEntity>).GetProperty(nameof(ScoredRecord<TEntity>.Scores))!,
+                scoresArrayExpr
+            )
+        );
+
+        // Create the final lambda expression
+        var lambda = Expression.Lambda<Func<TEntity, ScoredRecord<TEntity>>>(
+            selectExpr,
+            entityParameter
+        );
+
+        return query.Select(lambda);
     }
 
     private static string GetPropertyPath<TEntity>(Expression<Func<TEntity, string>> propertyExpression)
