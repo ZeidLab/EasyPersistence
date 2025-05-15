@@ -9,5 +9,11 @@ public sealed class ScoredRecord<TEntity>
 
     public required double Score { get; set; }
 
-    public IDictionary<string, double>? Scores { get; set; }
+    public IEnumerable<PropertyScore>? Scores { get; set; }
+}
+
+public sealed class PropertyScore
+{
+    public string Name { get; set; }
+    public double Score { get; set; }
 }

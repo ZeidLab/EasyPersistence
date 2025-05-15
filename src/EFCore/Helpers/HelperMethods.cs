@@ -163,18 +163,22 @@ public static class HelperMethods
         if (string.IsNullOrEmpty(searchTerm) || propertyExpressions.Length == 0)
             return query.Select(x => new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = null });
 
+        var paths = propertyExpressions.Select(GetPropertyPath).ToList();
+        
         return query.Select(entity => new
             {
                 Entity = entity,
-                Scores = propertyExpressions.ToDictionary(
-                    property => GetPropertyPath(property),
-                    property => FuzzySearch(searchTerm, BuildPropertyAccessExpression(entity, property))
-                )
+                Scores = paths.Select(
+                    property => new PropertyScore {
+                        Name = property,
+                        Score = FuzzySearch(searchTerm, EF.Property<string>(entity!, property))
+                    }
+                ),
             })
             .Select(records => new ScoredRecord<TEntity>
             {
                 Entity = records.Entity,
-                Score = records.Scores.Values.Average(),
+                Score = records.Scores.Average(x => x.Score),
                 Scores = records.Scores,
             });
     }
@@ -193,13 +197,7 @@ public static class HelperMethods
         return string.Join(".", path);
     }
 
-    private static string BuildPropertyAccessExpression<TEntity>(
-        TEntity entity,
-        Expression<Func<TEntity, string>> propertyExpression)
-    {
-        var propertyPath = GetPropertyPath(propertyExpression);
-        return EF.Property<string>(entity!, propertyPath);
-    }
+   
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
