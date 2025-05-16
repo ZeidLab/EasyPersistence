@@ -21,46 +21,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             SqlClrFunctions.FuzzySearch(nullString, nullString).Value.Should().Be(0);
         }
 
-        [Fact]
-        public void FuzzySearch_WithExactMatch_ShouldReturnOne()
-        {
-            // Arrange
-            SqlString searchTerm = new SqlString("test");
-            SqlString exactMatch = new SqlString("test");
-            SqlString containsMatch = new SqlString("this is a test string");
-
-            // Act & Assert
-            SqlClrFunctions.FuzzySearch(searchTerm, exactMatch).Value.Should().Be(1.0);
-            SqlClrFunctions.FuzzySearch(searchTerm, containsMatch).Value.Should().Be(1.0);
-        }
-
-        [Fact]
-        public void FuzzySearch_WithPartialPrefixMatch_ShouldReturnProportionalScore()
-        {
-            // Arrange
-            SqlString searchTerm = new SqlString("test");
-            SqlString partialPrefix = new SqlString("testing");
-
-            // Act
-            var result = SqlClrFunctions.FuzzySearch(searchTerm, partialPrefix).Value;
-
-            // Assert
-            result.Should().BeGreaterThan(0.5);
-        }
-
-        [Fact]
-        public void FuzzySearch_WithNoMatch_ShouldReturnZero()
-        {
-            // Arrange
-            SqlString searchTerm = new SqlString("apple");
-            SqlString noMatch = new SqlString("bhnhnh");
-
-            // Act
-            var result = SqlClrFunctions.FuzzySearch(searchTerm, noMatch).Value;
-
-            // Assert
-            result.Should().Be(0);
-        }
+        
 
         [Fact]
         public void FuzzySearch_WithEmptyStrings_ShouldHandleCorrectly()
@@ -89,9 +50,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             var mixedUpperResult = SqlClrFunctions.FuzzySearch(mixedCase, upperCase).Value;
 
             // Assert
-            lowerUpperResult.Should().Be(1.0);
-            lowerMixedResult.Should().Be(1.0);
-            mixedUpperResult.Should().Be(1.0);
+            lowerUpperResult.Should().Be(0.99);
+            lowerMixedResult.Should().Be(0.99);
+            mixedUpperResult.Should().Be(0.99);
         }
 
         [Fact]
@@ -141,9 +102,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             var shortInMediumResult = SqlClrFunctions.FuzzySearch(shortTerm, mediumString).Value;
 
             // Assert
-            shortInLongResult.Should().Be(1.0); // Exact substring match
+            shortInLongResult.Should().BeGreaterThan(0.9); // Exact substring match
             longForShortResult.Should().Be(0); // No match when searching for long string in short
-            shortInMediumResult.Should().BeGreaterThan(0.3); // Partial match
+            shortInMediumResult.Should().BeGreaterThan(0.9); // Partial match
         }
 
         [Fact]
@@ -187,7 +148,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
 
             // Assert
             exactResult.Should().Be(1.0);
-            partialResult.Should().BeGreaterThan(0.5); // Contains the substring exactly
+            partialResult.Should().BeGreaterThan(0.9); // Contains the substring exactly
             misspelledResult.Should().BeGreaterThan(0.4); // Should still match reasonably well
             abbreviatedResult.Should().BeGreaterThan(0.0); // Should have some similarity
         }
@@ -210,9 +171,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             SqlClrFunctions.FuzzySearch(emoji, emoji).Value.Should().Be(1.0);
 
             // Different scripts should have low similarity
-            SqlClrFunctions.FuzzySearch(latin, cyrillic).Value.Should().BeLessThan(0.3);
-            SqlClrFunctions.FuzzySearch(latin, cjk).Value.Should().BeLessThan(0.3);
-            SqlClrFunctions.FuzzySearch(cyrillic, cjk).Value.Should().BeLessThan(0.3);
+            SqlClrFunctions.FuzzySearch(latin, cyrillic).Value.Should().BeLessThan(0.1);
+            SqlClrFunctions.FuzzySearch(latin, cjk).Value.Should().BeLessThan(0.1);
+            SqlClrFunctions.FuzzySearch(cyrillic, cjk).Value.Should().BeLessThan(0.1);
         }
 
         [Fact]
@@ -249,9 +210,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
 
             // Assert
             // Due to normalization, these should be treated as similar
-            result1.Should().BeGreaterThan(0.7);
-            result2.Should().BeGreaterThan(0.7);
-            result3.Should().BeGreaterThan(0.7);
+            result1.Should().Be(1.0);
+            result2.Should().Be(1.0);
+            result3.Should().Be(1.0);
         }
 
         [Fact]

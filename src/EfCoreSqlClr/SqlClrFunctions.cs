@@ -12,14 +12,17 @@ public static class SqlClrFunctions
     public static SqlDouble FuzzySearch(SqlString searchTerm, SqlString comparedString)
     {
         if (string.IsNullOrWhiteSpace(searchTerm.Value)
-            || string.IsNullOrWhiteSpace(comparedString.Value)
-            || searchTerm.Value.Length > comparedString.Value.Length)
+            || string.IsNullOrWhiteSpace(comparedString.Value))
             return new SqlDouble(0);
 
         // Normalize the strings to ensure consistent comparison
         string term = searchTerm.Value.Normalize();
         string compared = comparedString.Value.Normalize();
-
+        
+        // after normalization if the term length is grater than compared length should return 0
+        if (term.Length > compared.Length)
+            return new SqlDouble(0);
+        
         // Quick exact match check case-sensitive
         if (compared.Equals(term, StringComparison.Ordinal))
             return new SqlDouble(1.0);
@@ -34,7 +37,7 @@ public static class SqlClrFunctions
             position += term.Length;
         }
 
-        if (position < 0)
+        if (matchedChars == 0)
         {
             // Calculate n-gram similarity for more accurate matching
             var similarity = NGram.CalculateNGramSimilarity(term.ToLowerInvariant(), compared.ToLowerInvariant());
