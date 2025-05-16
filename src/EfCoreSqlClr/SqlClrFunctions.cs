@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlTypes;
+using System.Linq;
 
 using Microsoft.SqlServer.Server;
 
@@ -10,20 +11,22 @@ public static class SqlClrFunctions
     [SqlFunction]
     public static SqlDouble FuzzySearch(SqlString searchTerm, SqlString comparedString)
     {
-        if (searchTerm.IsNull || comparedString.IsNull)
+        if (string.IsNullOrWhiteSpace(searchTerm.Value)
+            || string.IsNullOrWhiteSpace(comparedString.Value)
+            || searchTerm.Value.Length > comparedString.Value.Length)
             return new SqlDouble(0);
 
-        // Convert values to lowercase immediately to avoid multiple conversions later
-        string term = searchTerm.Value.ToLowerInvariant();
-        string compared = comparedString.Value.ToLowerInvariant();
-
-        // Quick exact match check
-        if (compared.Contains(term))
+        // Normalize the strings to ensure consistent comparison
+        string term = searchTerm.Value.Normalize();
+        string compared = comparedString.Value.Normalize();
+        
+        // Quick exact match check case-sensitive
+        if (compared.Equals(term, StringComparison.Ordinal))
             return new SqlDouble(1.0);
 
-        // Length-based optimizations
-        if (term.Length == 0 || term.Length > compared.Length)
-            return new SqlDouble(0);
+        // Quick exact match check case-insensitive
+        if (compared.Equals(term, StringComparison.OrdinalIgnoreCase))
+            return new SqlDouble(0.95);
         
         // Calculate n-gram similarity for more accurate matching
         return new SqlDouble(CalculateNGramSimilarity(term, compared));
@@ -61,7 +64,7 @@ public static class SqlClrFunctions
         }
 
         // Return normalized similarity score with a scaling factor
-        return totalWeight > 0 ? (totalWeightedSimilarity / totalWeight) * 0.7 : 0;
+        return totalWeight > 0 ? (totalWeightedSimilarity / totalWeight) * 0.9 : 0;
     }
 
     // Optimized method to count intersections directly without creating intermediate arrays
@@ -103,5 +106,4 @@ public static class SqlClrFunctions
 
         return count;
     }
-    
 }
