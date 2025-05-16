@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Data.SqlTypes;
 
 using Microsoft.SqlServer.Server;
@@ -14,50 +13,49 @@ public static class SqlClrFunctions
         if (searchTerm.IsNull || comparedString.IsNull)
             return new SqlDouble(0);
 
-        string term = searchTerm.Value.Normalize();
-        string compared = comparedString.Value.Normalize();
+        // Convert values to lowercase immediately to avoid multiple conversions later
+        string term = searchTerm.Value.ToLowerInvariant();
+        string compared = comparedString.Value.ToLowerInvariant();
 
-        // Quick exact match check (case-sensitive)
+        // Quick exact match check
         if (compared.Contains(term))
             return new SqlDouble(1.0);
 
-        // Quick case-insensitive check
-        if (compared.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
-            return new SqlDouble(0.8);
-
+        // Length-based optimizations
+        if (term.Length == 0 || term.Length > compared.Length)
+            return new SqlDouble(0);
+        
+        // Calculate n-gram similarity for more accurate matching
         return new SqlDouble(CalculateNGramSimilarity(term, compared));
     }
 
     private static double CalculateNGramSimilarity(string term, string compared)
     {
-        // Convert to lowercase to ensure case-insensitive comparison
-        term = term.ToLowerInvariant();
-        compared = compared.ToLowerInvariant();
-        
         double totalWeightedSimilarity = 0;
         double totalWeight = 0;
 
         // Limit n-gram size to improve performance while maintaining accuracy
-        int maxNGramSize = Math.Min(term.Length, 4);
-        
+        int maxNGramSize = Math.Min(term.Length, 3);
+
+        // Reusable character buffer for n-grams
+        char[] ngramBuffer = new char[maxNGramSize];
+
         for (int n = 1; n <= maxNGramSize; n++)
         {
-            // Use arrays instead of dictionaries to avoid potential issues with SQL CLR
-            var termNGrams = GenerateNGrams(term, n);
-            var comparedNGrams = GenerateNGrams(compared, n);
-            
-            // Check if any n-grams were generated
-            if (termNGrams.Length == 0 || comparedNGrams.Length == 0)
+            // Calculate intersection directly without creating intermediate arrays
+            int termNGramCount = term.Length - n + 1;
+            int comparedNGramCount = compared.Length - n + 1;
+
+            if (termNGramCount <= 0 || comparedNGramCount <= 0)
                 continue;
 
-            // Calculate intersection using simple array operations
-            int intersection = CountIntersection(termNGrams, comparedNGrams);
+            int intersection = CountIntersectionDirect(term, compared, n, ngramBuffer);
 
             // Calculate Dice coefficient
-            double diceCoefficient = (2.0 * intersection) / (termNGrams.Length + comparedNGrams.Length);
+            double diceCoefficient = (2.0 * intersection) / (termNGramCount + comparedNGramCount);
 
             // Weight by n-gram size relative to term length
-            double weight = (double)n / Math.Max(1, maxNGramSize);
+            double weight = (double)n / maxNGramSize;
             totalWeightedSimilarity += diceCoefficient * weight;
             totalWeight += weight;
         }
@@ -65,39 +63,45 @@ public static class SqlClrFunctions
         // Return normalized similarity score with a scaling factor
         return totalWeight > 0 ? (totalWeightedSimilarity / totalWeight) * 0.7 : 0;
     }
-    
-    private static string[] GenerateNGrams(string text, int n)
-    {
-        if (text.Length < n)
-            return Array.Empty<string>();
-            
-        string[] result = new string[text.Length - n + 1];
-        
-        for (int i = 0; i <= text.Length - n; i++)
-        {
-            result[i] = text.Substring(i, n);
-        }
-        
-        return result;
-    }
-      private static int CountIntersection(string[] array1, string[] array2)
+
+    // Optimized method to count intersections directly without creating intermediate arrays
+    private static int CountIntersectionDirect(string term, string compared, int ngramSize, char[] buffer)
     {
         int count = 0;
-        
-        // Use a simple algorithm that works well for small arrays
-        // This is more efficient than using HashSet in SQL CLR with SAFE permission
-        foreach (string item1 in array1)
+        int termNGramCount = term.Length - ngramSize + 1;
+        int comparedNGramCount = compared.Length - ngramSize + 1;
+
+        // Use buffer to avoid string allocations
+        for (int i = 0; i < termNGramCount; i++)
         {
-            foreach (string item2 in array2)
+            // Copy current term n-gram to buffer
+            for (int c = 0; c < ngramSize; c++)
             {
-                if (string.Equals(item1, item2, StringComparison.Ordinal))
+                buffer[c] = term[i + c];
+            }
+
+            // Check against all n-grams in compared string
+            for (int j = 0; j < comparedNGramCount; j++)
+            {
+                bool match = true;
+                for (int c = 0; c < ngramSize; c++)
+                {
+                    if (buffer[c] != compared[j + c])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
                 {
                     count++;
-                    break;
+                    break; // Found a match for this n-gram, move to next
                 }
             }
         }
-        
+
         return count;
     }
+    
 }
