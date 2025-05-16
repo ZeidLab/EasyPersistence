@@ -18,11 +18,11 @@ public static class SqlClrFunctions
         // Normalize the strings to ensure consistent comparison
         string term = searchTerm.Value.Normalize();
         string compared = comparedString.Value.Normalize();
-        
+
         // after normalization if the term length is grater than compared length should return 0
         if (term.Length > compared.Length)
             return new SqlDouble(0);
-        
+
         // Quick exact match check case-sensitive
         if (compared.Equals(term, StringComparison.Ordinal))
             return new SqlDouble(1.0);
@@ -52,8 +52,6 @@ public static class SqlClrFunctions
 
     private static double NormalizeTheScore(double score)
     {
-        double normalized = (score / 10.0) * 9.0;
-        double rounded = Math.Round(normalized, 4);
-        return rounded < 0.0001 ? 0 : rounded;
+        return (score / 10.0) * 9.0;
     }
 }

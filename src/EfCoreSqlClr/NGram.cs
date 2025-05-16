@@ -69,13 +69,55 @@ internal static class NGram
 
         // 1) Build frequency map of cp1's n‑gram keys
         var freq = new Dictionary<ulong, int>(count1);
-        for (int i = 0; i < count1; i++)
+        
+        // First add the standard first n-gram
+        ulong firstKey = PackNGram(cp1, 0, n, maxBits);
+        AddToFrequencyMap(firstKey, freq);
+
+        // Add progressive n-grams with dynamic skipping patterns
+        if (cp1.Length >= n)
         {
-            ulong key = PackNGram(cp1, i, n, maxBits);
-            if (freq.TryGetValue(key, out int c))
-                freq[key] = c + 1;
-            else
-                freq[key] = 1;
+            // For different starting positions
+            for (int start = 0; start <= cp1.Length - n; start++)
+            {
+                // Add standard n-gram for this position
+                ulong key = PackNGram(cp1, start, n, maxBits);
+                AddToFrequencyMap(key, freq);
+        
+                // Create special n-grams with prefix + distant characters
+                for (int prefixLen = 1; prefixLen < n; prefixLen++)
+                {
+                    int remainingChars = n - prefixLen;
+            
+                    // Find all combinations for remaining positions
+                    for (int nextPos = start + prefixLen; nextPos <= cp1.Length - remainingChars; nextPos++)
+                    {
+                        // Create custom n-gram
+                        int[] customGram = new int[n];
+                
+                        // Add prefix characters
+                        for (int i = 0; i < prefixLen; i++)
+                        {
+                            customGram[i] = cp1[start + i];
+                        }
+                
+                        // Add remaining characters from later positions
+                        for (int i = 0; i < remainingChars; i++)
+                        {
+                            customGram[prefixLen + i] = cp1[nextPos + i];
+                        }
+                
+                        // Pack and add to frequency map
+                        ulong customKey = 0;
+                        for (int i = 0; i < n; i++)
+                        {
+                            customKey = (customKey << maxBits) | (uint)customGram[i];
+                        }
+                
+                        AddToFrequencyMap(customKey, freq);
+                    }
+                }
+            }
         }
 
         // 2) Stream through cp2 to count intersections
@@ -94,6 +136,14 @@ internal static class NGram
         return (2.0 * intersection) / (count1 + count2);
     }
 
+    private static void AddToFrequencyMap(ulong key, Dictionary<ulong, int> freq)
+    {
+        if (freq.TryGetValue(key, out int c))
+            freq[key] = c + 1;
+        else
+            freq[key] = 1;
+    }
+    
     #endregion
 
     #region Unicode Decoding Helpers
