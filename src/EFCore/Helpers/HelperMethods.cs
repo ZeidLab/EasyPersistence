@@ -153,13 +153,16 @@ public static class HelperMethods
         {
             return ReferenceEquals(node, _old) ? _new : base.VisitParameter(node);
         }
-    }    public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
+    }
+
+    public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
         params Expression<Func<TEntity, string>>[] propertyExpressions)
     {
         if (string.IsNullOrEmpty(searchTerm) || propertyExpressions.Length == 0)
-            return query.Select(x => new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = Enumerable.Empty<PropertyScore>() });
+            return query.Select(x =>
+                new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = Enumerable.Empty<PropertyScore>() });
 
         // Create the parameter for our entity
         var entityParameter = Expression.Parameter(typeof(TEntity), "entity");
@@ -171,7 +174,7 @@ public static class HelperMethods
             var propertyPath = GetPropertyPath(propExpr);
             var visitor = new ParameterReplacer(propExpr.Parameters[0], entityParameter);
             var propertyAccess = visitor.Visit(propExpr.Body);
-            
+
             // For the property score, use property name and fuzzy search score
             return Expression.MemberInit(
                 Expression.New(typeof(PropertyScore)),
@@ -211,19 +214,19 @@ public static class HelperMethods
         {
             // For multiple properties, we'll add all scores and divide by the count
             // First map out all the individual score expressions
-            var scoreExpressions = propertyScores.Select(p => 
+            var scoreExpressions = propertyScores.Select(p =>
                 Expression.PropertyOrField(p, nameof(PropertyScore.Score))).ToArray();
-            
+
             // Sum them up
             Expression sumExpr = scoreExpressions[0];
             for (int i = 1; i < scoreExpressions.Length; i++)
             {
                 sumExpr = Expression.Add(sumExpr, scoreExpressions[i]);
             }
-            
+
             // Divide by count to get average
             avgScoreExpr = Expression.Divide(
-                sumExpr, 
+                sumExpr,
                 Expression.Constant((double)propertyScores.Length)
             );
         }
@@ -258,7 +261,7 @@ public static class HelperMethods
 
         return query.Select(lambda).Where(r => r.Score > 0);
     }
-    
+
     // Get property path from expression like x => x.Property or x => x.NestedObject.Property
     private static string GetPropertyPath<TEntity>(Expression<Func<TEntity, string>> propertyExpression)
     {
@@ -273,7 +276,7 @@ public static class HelperMethods
 
         return string.Join(".", path);
     }
-  
+
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
