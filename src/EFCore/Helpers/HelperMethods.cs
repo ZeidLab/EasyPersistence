@@ -153,9 +153,7 @@ public static class HelperMethods
         {
             return ReferenceEquals(node, _old) ? _new : base.VisitParameter(node);
         }
-    }
-
-    public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
+    }    public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
         params Expression<Func<TEntity, string>>[] propertyExpressions)
@@ -173,7 +171,8 @@ public static class HelperMethods
             var propertyPath = GetPropertyPath(propExpr);
             var visitor = new ParameterReplacer(propExpr.Parameters[0], entityParameter);
             var propertyAccess = visitor.Visit(propExpr.Body);
-
+            
+            // For the property score, use property name and fuzzy search score
             return Expression.MemberInit(
                 Expression.New(typeof(PropertyScore)),
                 Expression.Bind(
@@ -183,52 +182,59 @@ public static class HelperMethods
                 Expression.Bind(
                     typeof(PropertyScore).GetProperty(nameof(PropertyScore.Score))!,
                     Expression.Call(
+                        null,
                         typeof(HelperMethods).GetMethod(nameof(FuzzySearch))!,
                         searchTermConstant,
-                        propertyAccess
+                        Expression.Coalesce(propertyAccess, Expression.Constant(string.Empty))
                     )
                 )
             );
-        }).ToList();
+        }).ToArray();
 
-        // Create an array of PropertyScore expressions
-        var scoresArrayExpr = Expression.NewArrayInit(typeof(PropertyScore), propertyScores);
-
-        // Calculate average score
-        var selectorParam = Expression.Parameter(typeof(PropertyScore), "x");
-        var selectorExpr = Expression.Lambda<Func<PropertyScore, double>>(
-            Expression.Property(selectorParam, nameof(PropertyScore.Score)),
-            selectorParam
+        // Create array of property scores
+        var scoresArrayExpr = Expression.NewArrayInit(
+            typeof(PropertyScore),
+            propertyScores
         );
 
-#pragma warning disable S1481
-        var SecoundAvrageMethod = typeof(Enumerable)
-            .GetMethods()
-            .Where(x => string.Equals(x.Name, nameof(Enumerable.Average), StringComparison.Ordinal))
-            .Where(x => x.ReturnType == typeof(double))
-            .LastOrDefault(m => m.GetParameters().Length == 2 &&
-                                m.GetParameters()[0].ParameterType.IsGenericType &&
-                                m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
-                                m.GetParameters()[1].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>))!
-            .MakeGenericMethod(typeof(PropertyScore));
+        // Create a direct calculation for the average score
+        // We'll calculate it manually since we don't have direct access to Enumerable.Average in a way
+        // that EF Core can translate to SQL
+        Expression avgScoreExpr;
 
-        
-        var averageMethod = typeof(Enumerable).GetMethods()
-            .First(m => string.Equals(m.Name, nameof(Enumerable.Average)) &&
-                       m.GetParameters().Length == 2 &&
-                       m.GetParameters()[1].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>) &&
-                       m.ReturnType == typeof(double))
-            .MakeGenericMethod(typeof(PropertyScore));
-#pragma warning restore S1481
-
-        var avgScoreExpr = Expression.Call(
-            SecoundAvrageMethod,
-            scoresArrayExpr,
-            selectorExpr
-        );
+        if (propertyScores.Length == 1)
+        {
+            // If there's only one property, the score is just that property's score
+            avgScoreExpr = Expression.PropertyOrField(propertyScores[0], nameof(PropertyScore.Score));
+        }
+        else if (propertyScores.Length > 1)
+        {
+            // For multiple properties, we'll add all scores and divide by the count
+            // First map out all the individual score expressions
+            var scoreExpressions = propertyScores.Select(p => 
+                Expression.PropertyOrField(p, nameof(PropertyScore.Score))).ToArray();
+            
+            // Sum them up
+            Expression sumExpr = scoreExpressions[0];
+            for (int i = 1; i < scoreExpressions.Length; i++)
+            {
+                sumExpr = Expression.Add(sumExpr, scoreExpressions[i]);
+            }
+            
+            // Divide by count to get average
+            avgScoreExpr = Expression.Divide(
+                sumExpr, 
+                Expression.Constant((double)propertyScores.Length)
+            );
+        }
+        else
+        {
+            // Fallback case - shouldn't happen given our initial check
+            avgScoreExpr = Expression.Constant(0.0);
+        }
 
         // Create final select expression
-        var selectExpr = Expression.MemberInit(
+        var finalSelectExpr = Expression.MemberInit(
             Expression.New(typeof(ScoredRecord<TEntity>)),
             Expression.Bind(
                 typeof(ScoredRecord<TEntity>).GetProperty(nameof(ScoredRecord<TEntity>.Entity))!,
@@ -246,13 +252,14 @@ public static class HelperMethods
 
         // Create the final lambda expression
         var lambda = Expression.Lambda<Func<TEntity, ScoredRecord<TEntity>>>(
-            selectExpr,
+            finalSelectExpr,
             entityParameter
         );
 
-        return query.Select(lambda);
+        return query.Select(lambda).Where(r => r.Score > 0);
     }
-
+    
+    // Get property path from expression like x => x.Property or x => x.NestedObject.Property
     private static string GetPropertyPath<TEntity>(Expression<Func<TEntity, string>> propertyExpression)
     {
         var memberExpression = propertyExpression.Body as MemberExpression;
@@ -266,7 +273,7 @@ public static class HelperMethods
 
         return string.Join(".", path);
     }
-
+  
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
