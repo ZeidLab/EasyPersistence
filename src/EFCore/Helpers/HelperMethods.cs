@@ -259,7 +259,7 @@ public static class HelperMethods
             entityParameter
         );
 
-        return query.Select(lambda).Where(r => r.Score > 0);
+        return query.Select(lambda);
     }
 
     // Get property path from expression like x => x.Property or x => x.NestedObject.Property

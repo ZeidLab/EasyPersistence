@@ -27,19 +27,18 @@ public static class SqlClrFunctions
         // Find all occurrences of term in compared (case-insensitive)
         int position = 0;
         int matchedChars = 0;
-        int termLength = term.Length;
-
 
         while ((position = compared.IndexOf(term, position, StringComparison.OrdinalIgnoreCase)) != -1)
         {
-            matchedChars += termLength;
-            position += termLength;
+            matchedChars += term.Length;
+            position += term.Length;
         }
 
         if (position < 0)
         {
             // Calculate n-gram similarity for more accurate matching
-            return new SqlDouble(CalculateNGramSimilarity(term, compared));
+            var similarity = NGram.CalculateNGramSimilarity(term.ToLowerInvariant(), compared.ToLowerInvariant());
+            return new SqlDouble(NormalizeTheScore(similarity));
         }
 
         // Normalize to 0.00-0.09 range and add to base score of 0.9
@@ -48,78 +47,10 @@ public static class SqlClrFunctions
         return new SqlDouble(score);
     }
 
-    private static double CalculateNGramSimilarity(string term, string compared)
+    private static double NormalizeTheScore(double score)
     {
-        double totalWeightedSimilarity = 0;
-        double totalWeight = 0;
-
-        // Limit n-gram size to improve performance while maintaining accuracy
-        int maxNGramSize = Math.Min(term.Length, 3);
-
-        // Reusable character buffer for n-grams
-        char[] ngramBuffer = new char[maxNGramSize];
-
-        for (int n = 1; n <= maxNGramSize; n++)
-        {
-            // Calculate intersection directly without creating intermediate arrays
-            int termNGramCount = term.Length - n + 1;
-            int comparedNGramCount = compared.Length - n + 1;
-
-            if (termNGramCount <= 0 || comparedNGramCount <= 0)
-                continue;
-
-            int intersection = CountIntersectionDirect(term, compared, n, ngramBuffer);
-
-            // Calculate Dice coefficient
-            double diceCoefficient = (2.0 * intersection) / (termNGramCount + comparedNGramCount);
-
-            // Weight by n-gram size relative to term length
-            double weight = (double)n / maxNGramSize;
-            totalWeightedSimilarity += diceCoefficient * weight;
-            totalWeight += weight;
-        }
-
-        // Return normalized similarity score with a scaling factor
-        return totalWeight > 0 ? (totalWeightedSimilarity / totalWeight) * 0.9 : 0;
-    }
-
-    // Optimized method to count intersections directly without creating intermediate arrays
-    private static int CountIntersectionDirect(string term, string compared, int ngramSize, char[] buffer)
-    {
-        int count = 0;
-        int termNGramCount = term.Length - ngramSize + 1;
-        int comparedNGramCount = compared.Length - ngramSize + 1;
-
-        // Use buffer to avoid string allocations
-        for (int i = 0; i < termNGramCount; i++)
-        {
-            // Copy current term n-gram to buffer
-            for (int c = 0; c < ngramSize; c++)
-            {
-                buffer[c] = term[i + c];
-            }
-
-            // Check against all n-grams in compared string
-            for (int j = 0; j < comparedNGramCount; j++)
-            {
-                bool match = true;
-                for (int c = 0; c < ngramSize; c++)
-                {
-                    if (buffer[c] != compared[j + c])
-                    {
-                        match = false;
-                        break;
-                    }
-                }
-
-                if (match)
-                {
-                    count++;
-                    break; // Found a match for this n-gram, move to next
-                }
-            }
-        }
-
-        return count;
+        double normalized = (score / 10.0) * 9.0;
+        double rounded = Math.Round(normalized, 4);
+        return rounded < 0.0001 ? 0 : rounded;
     }
 }
