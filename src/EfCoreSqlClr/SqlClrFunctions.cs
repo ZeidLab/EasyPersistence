@@ -17,9 +17,11 @@ public static class SqlClrFunctions
         string term = searchTerm.Value.Normalize();
         string compared = comparedString.Value.Normalize();
 
+        // Quick exact match check (case-sensitive)
         if (compared.Contains(term))
             return new SqlDouble(1.0);
 
+        // Quick case-insensitive check
         if (compared.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
             return new SqlDouble(0.8);
 
@@ -28,91 +30,74 @@ public static class SqlClrFunctions
 
     private static double CalculateNGramSimilarity(string term, string compared)
     {
+        // Convert to lowercase to ensure case-insensitive comparison
         term = term.ToLowerInvariant();
         compared = compared.ToLowerInvariant();
-
+        
         double totalWeightedSimilarity = 0;
         double totalWeight = 0;
 
-        for (int n = 1; n <= term.Length; n++)
+        // Limit n-gram size to improve performance while maintaining accuracy
+        int maxNGramSize = Math.Min(term.Length, 4);
+        
+        for (int n = 1; n <= maxNGramSize; n++)
         {
+            // Use arrays instead of dictionaries to avoid potential issues with SQL CLR
             var termNGrams = GenerateNGrams(term, n);
             var comparedNGrams = GenerateNGrams(compared, n);
-
-            if (termNGrams.Count == 0 || comparedNGrams.Count == 0)
+            
+            // Check if any n-grams were generated
+            if (termNGrams.Length == 0 || comparedNGrams.Length == 0)
                 continue;
 
-            int intersection = 0;
-            foreach (var ngram in termNGrams)
-            {
-                if (comparedNGrams.Contains(ngram))
-                    intersection++;
-            }
+            // Calculate intersection using simple array operations
+            int intersection = CountIntersection(termNGrams, comparedNGrams);
 
-            double diceCoefficient = (2.0 * intersection) / (termNGrams.Count + comparedNGrams.Count);
-            double weight = (double)n / term.Length;
+            // Calculate Dice coefficient
+            double diceCoefficient = (2.0 * intersection) / (termNGrams.Length + comparedNGrams.Length);
+
+            // Weight by n-gram size relative to term length
+            double weight = (double)n / Math.Max(1, maxNGramSize);
             totalWeightedSimilarity += diceCoefficient * weight;
             totalWeight += weight;
         }
 
+        // Return normalized similarity score with a scaling factor
         return totalWeight > 0 ? (totalWeightedSimilarity / totalWeight) * 0.7 : 0;
     }
-
-    private static HashSet<CharSpan> GenerateNGrams(string text, int n)
+    
+    private static string[] GenerateNGrams(string text, int n)
     {
-        var nGrams = new HashSet<CharSpan>();
-
         if (text.Length < n)
-            return nGrams;
-
+            return Array.Empty<string>();
+            
+        string[] result = new string[text.Length - n + 1];
+        
         for (int i = 0; i <= text.Length - n; i++)
         {
-            nGrams.Add(new CharSpan(text, i, n));
+            result[i] = text.Substring(i, n);
         }
-
-        return nGrams;
+        
+        return result;
     }
-}
-
-internal struct CharSpan : IEquatable<CharSpan>
-{
-    private readonly string _source;
-    private readonly int _start;
-    private readonly int _length;
-    private readonly int _hashCode;
-
-    public CharSpan(string source, int start, int length)
+      private static int CountIntersection(string[] array1, string[] array2)
     {
-        _source = source;
-        _start = start;
-        _length = length;
-
-        unchecked
+        int count = 0;
+        
+        // Use a simple algorithm that works well for small arrays
+        // This is more efficient than using HashSet in SQL CLR with SAFE permission
+        foreach (string item1 in array1)
         {
-            int hash = 17;
-            for (int i = 0; i < _length; i++)
+            foreach (string item2 in array2)
             {
-                hash = hash * 31 + _source[_start + i].GetHashCode();
+                if (string.Equals(item1, item2, StringComparison.Ordinal))
+                {
+                    count++;
+                    break;
+                }
             }
-
-            _hashCode = hash;
         }
+        
+        return count;
     }
-
-    public bool Equals(CharSpan other)
-    {
-        if (_length != other._length) return false;
-
-        for (int i = 0; i < _length; i++)
-        {
-            if (_source[_start + i] != other._source[other._start + i])
-                return false;
-        }
-
-        return true;
-    }
-
-    public override bool Equals(object obj) => obj is CharSpan other && Equals(other);
-
-    public override int GetHashCode() => _hashCode;
 }
