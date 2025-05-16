@@ -19,17 +19,33 @@ public static class SqlClrFunctions
         // Normalize the strings to ensure consistent comparison
         string term = searchTerm.Value.Normalize();
         string compared = comparedString.Value.Normalize();
-        
+
         // Quick exact match check case-sensitive
         if (compared.Equals(term, StringComparison.Ordinal))
             return new SqlDouble(1.0);
 
-        // Quick exact match check case-insensitive
-        if (compared.Equals(term, StringComparison.OrdinalIgnoreCase))
-            return new SqlDouble(0.95);
-        
-        // Calculate n-gram similarity for more accurate matching
-        return new SqlDouble(CalculateNGramSimilarity(term, compared));
+        // Find all occurrences of term in compared (case-insensitive)
+        int position = 0;
+        int matchedChars = 0;
+        int termLength = term.Length;
+
+
+        while ((position = compared.IndexOf(term, position, StringComparison.OrdinalIgnoreCase)) != -1)
+        {
+            matchedChars += termLength;
+            position += termLength;
+        }
+
+        if (position < 0)
+        {
+            // Calculate n-gram similarity for more accurate matching
+            return new SqlDouble(CalculateNGramSimilarity(term, compared));
+        }
+
+        // Normalize to 0.00-0.09 range and add to base score of 0.9
+        double score = 0.9 + (((double)matchedChars / compared.Length) * 0.09);
+
+        return new SqlDouble(score);
     }
 
     private static double CalculateNGramSimilarity(string term, string compared)
