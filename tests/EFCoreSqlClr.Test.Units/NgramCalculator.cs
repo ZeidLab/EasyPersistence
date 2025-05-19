@@ -7,8 +7,6 @@ internal static class NgramCalculatorExtensions
         // If the length is less than 3 or empty, return an empty array
         if (string.IsNullOrEmpty(input) || input.Length < 3)
             return [];
-        if (input.Length > 10)
-            throw new InvalidOperationException("The input string is too long. The maximum length is 10 characters.");
 
         // Normalize the input string
         var ns = input.Normalize().ToLowerInvariant();
@@ -16,6 +14,14 @@ internal static class NgramCalculatorExtensions
         // If the length is 3, return the input string as a single 3-gram
         if (ns.Length == 3)
             return [ns];
+
+        if (ns.Length > 8)
+        {
+            return Enumerable.Range(0, ns.Length - 2)
+                .Select(i => ns.Substring(i, 3))
+                .ToHashSet().ToArray();
+        }
+
         // Create a list to store the 3-grams
         var gramsList = new List<string>();
         for (int i = 0; i < ns.Length - 2; i++)
