@@ -41,7 +41,7 @@
     <PackageVersion Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1" />
     <PackageVersion Include="ConfigureAwaitEnforcer" Version="2.0.0" />
   </ItemGroup>
-  <ItemGroup Label="Code Analyzers" Condition="$(MSBuildProjectDirectory.Contains('src'))">
+  <ItemGroup Label="Code Analyzers" Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src\'))">
     <PackageReference Include="AsyncMethodNameFixer" />
     <PackageReference Include="ConfigureAwaitChecker.Analyzer" />
     <PackageReference Include="ConfigureAwaitEnforcer" />

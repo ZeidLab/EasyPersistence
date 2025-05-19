@@ -41,7 +41,6 @@
     <ItemGroup>
         <Compile Include="SqlClrFunctions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="NGram.cs" />
     </ItemGroup>
   
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

@@ -11,47 +11,67 @@ public static class SqlClrFunctions
     [SqlFunction]
     public static SqlDouble FuzzySearch(SqlString searchTerm, SqlString comparedString)
     {
-        if (string.IsNullOrWhiteSpace(searchTerm.Value)
-            || string.IsNullOrWhiteSpace(comparedString.Value))
+        if (string.IsNullOrWhiteSpace(comparedString.Value)
+            || string.IsNullOrWhiteSpace(searchTerm.Value)
+           )
             return new SqlDouble(0);
+
+        var grams = searchTerm.Value
+            .Normalize()
+            .ToLowerInvariant()
+            .Split([';'], StringSplitOptions.RemoveEmptyEntries);
+        // If the search term is empty or null, return 0
+        if (grams.Length < 2)
+            return new SqlDouble(0);
+
+        if (!int.TryParse(grams[0].Trim(), out int originalTermLength) || originalTermLength < 3)
+        {
+            // If the first part of the search term is not a valid integer or less than 3, return 0
+            return new SqlDouble(0);
+        }
+        
 
         // Normalize the strings to ensure consistent comparison
-        string term = searchTerm.Value.Normalize();
-        string compared = comparedString.Value.Normalize();
+        string compared = comparedString.Value
+            .Normalize()
+            .ToLowerInvariant();
+
 
         // after normalization if the term length is grater than compared length should return 0
-        if (term.Length > compared.Length)
+        if (compared.Length < 3)
             return new SqlDouble(0);
 
-        // Quick exact match check case-sensitive
-        if (compared.Equals(term, StringComparison.Ordinal))
-            return new SqlDouble(1.0);
-
         // Find all occurrences of term in compared (case-insensitive)
-        int position = 0;
-        int matchedChars = 0;
+        //int matchedChars = 0;
 
-        while ((position = compared.IndexOf(term, position, StringComparison.OrdinalIgnoreCase)) != -1)
-        {
-            matchedChars += term.Length;
-            position += term.Length;
-        }
+        // foreach (string gram in grams)
+        // {
+        //     for (int i = 0; i < compared.Length -2; i++)
+        //     {
+        //         var j = i + 1;
+        //         var k = i + 2;
+        //         if (gram[0] == compared[i] && gram[1] == compared[j] && gram[2] == compared[k])
+        //         {
+        //             matchedChars++;
+        //         }
+        //     }
+        // }
 
-        if (matchedChars == 0)
-        {
-            // Calculate n-gram similarity for more accurate matching
-            var similarity = NGram.CalculateNGramSimilarity(term.ToLowerInvariant(), compared.ToLowerInvariant());
-            return new SqlDouble(NormalizeTheScore(similarity));
-        }
+        var comparedGrams = Enumerable.Range(0, compared.Length - 2)
+            .Select(i => compared.Substring(i, 3))
+            .ToHashSet();
 
-        // Normalize to 0.00-0.09 range and add to base score of 0.9
-        double score = 0.9 + (((double)matchedChars / compared.Length) * 0.09);
+        int hits = grams.Skip(1)
+            .Count(gram => comparedGrams.Contains(gram));
+
+        var score = DiceCoefficientCalculation(hits, originalTermLength, comparedGrams.Count);
 
         return new SqlDouble(score);
     }
 
-    private static double NormalizeTheScore(double score)
+    private static double DiceCoefficientCalculation(int hits, int termGramsLength, int compGramsLength)
     {
-        return (score / 10.0) * 9.0;
+        // Compute Dice similarity: 2 * |intersection| / (|set1| + |set2|)
+        return (2.0 * hits) / (termGramsLength + compGramsLength);
     }
 }

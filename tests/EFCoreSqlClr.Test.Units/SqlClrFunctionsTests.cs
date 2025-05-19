@@ -1,4 +1,3 @@
-using System;
 using System.Data.SqlTypes;
 using System.Text;
 
@@ -20,8 +19,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             SqlClrFunctions.FuzzySearch(validString, nullString).Value.Should().Be(0);
             SqlClrFunctions.FuzzySearch(nullString, nullString).Value.Should().Be(0);
         }
-
-        
 
         [Fact]
         public void FuzzySearch_WithEmptyStrings_ShouldHandleCorrectly()
@@ -74,7 +71,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             // Arrange
             SqlString correct = new SqlString("testing");
             SqlString typo1 = new SqlString("testign"); // Transposition
-            SqlString typo2 = new SqlString("testng");  // Missing character
+            SqlString typo2 = new SqlString("testng"); // Missing character
             SqlString typo3 = new SqlString("testting"); // Extra character
 
             // Act
@@ -93,7 +90,8 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange
             SqlString shortTerm = new SqlString("test");
-            SqlString veryLongString = new SqlString("this is a very long string with the word test somewhere in the middle and continues on");
+            SqlString veryLongString =
+                new SqlString("this is a very long string with the word test somewhere in the middle and continues on");
             SqlString mediumString = new SqlString("testing purposes only");
 
             // Act
@@ -160,9 +158,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange - Include characters from different scripts and planes
             SqlString latin = new SqlString("hello");
-            SqlString cyrillic = new SqlString("привет");  // Russian
-            SqlString cjk = new SqlString("你好");  // Chinese
-            SqlString emoji = new SqlString("👋🏻");  // Wave emoji with skin tone modifier (surrogate pair)
+            SqlString cyrillic = new SqlString("привет"); // Russian
+            SqlString cjk = new SqlString("你好"); // Chinese
+            SqlString emoji = new SqlString("👋🏻"); // Wave emoji with skin tone modifier (surrogate pair)
 
             // Act & Assert - Test fuzzy matching within same scripts
             SqlClrFunctions.FuzzySearch(latin, latin).Value.Should().Be(1.0);
@@ -181,9 +179,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange - Characters outside the BMP that require surrogate pairs in UTF-16
             SqlString bmpOnly = new SqlString("abc");
-            SqlString withEmoji = new SqlString("abc😀");  // Basic Latin + emoji
-            SqlString complexEmoji = new SqlString("👨‍👩‍👧‍👦");  // Family emoji (multiple surrogate pairs)
-            SqlString mathSymbols = new SqlString("𝔸𝔹ℂ");  // Mathematical symbols
+            SqlString withEmoji = new SqlString("abc😀"); // Basic Latin + emoji
+            SqlString complexEmoji = new SqlString("👨‍👩‍👧‍👦"); // Family emoji (multiple surrogate pairs)
+            SqlString mathSymbols = new SqlString("𝔸𝔹ℂ"); // Mathematical symbols
 
             // Act & Assert
             SqlClrFunctions.FuzzySearch(bmpOnly, withEmoji).Value.Should().BeGreaterThan(0.5);
@@ -197,11 +195,11 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange
             // Same visual representation, different Unicode composition
-            SqlString precomposed = new SqlString("café");  // é is a single code point
-            SqlString decomposed = new SqlString("cafe\u0301");  // e + combining acute accent
+            SqlString precomposed = new SqlString("café"); // é is a single code point
+            SqlString decomposed = new SqlString("cafe\u0301"); // e + combining acute accent
 
             SqlString precomposedGerman = new SqlString("schön");
-            SqlString decomposedGerman = new SqlString("scho\u0308n");  // o + combining diaeresis
+            SqlString decomposedGerman = new SqlString("scho\u0308n"); // o + combining diaeresis
 
             // Act
             var result1 = SqlClrFunctions.FuzzySearch(precomposed, decomposed).Value;
@@ -220,9 +218,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange
             SqlString normal = new SqlString("test");
-            SqlString withZeroWidth = new SqlString("te\u200Bst");  // With zero-width space
-            SqlString withVariationSelector = new SqlString("test\uFE0E");  // With variation selector
-            SqlString withRtlMark = new SqlString("\u200Ftest");  // With right-to-left mark
+            SqlString withZeroWidth = new SqlString("te\u200Bst"); // With zero-width space
+            SqlString withVariationSelector = new SqlString("test\uFE0E"); // With variation selector
+            SqlString withRtlMark = new SqlString("\u200Ftest"); // With right-to-left mark
 
             // Act
             var resultZeroWidth = SqlClrFunctions.FuzzySearch(normal, withZeroWidth).Value;
@@ -291,8 +289,8 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
                 "привет",
                 new string('c', 200));
             SqlString searchLong = new SqlString(longString);
-            SqlString searchChinese = new SqlString("你好");
-            SqlString searchRussian = new SqlString("привет");
+            SqlString searchChinese = new SqlString("你好".Build3GramString());
+            SqlString searchRussian = new SqlString("привет".Build3GramString());
 
             // Act & Assert
             SqlClrFunctions.FuzzySearch(searchChinese, searchLong).Value.Should().Be(1.0);
@@ -323,44 +321,74 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         public void FuzzySearch_WithDifferentEncodingRepresentations_ShouldBeConsistent()
         {
             // We're testing logical consistency across different physical representations
-            
+
             // UTF-8 vs UTF-16 vs UTF-32 representations of the same string
             // Note: In C#, strings are always UTF-16 internally, but we can simulate the effect
-            
+
             // Create string with BMP characters vs supplementary characters
             string bmpChars = "Hello World";
             string supplementaryChars = "Hello 🌍"; // Globe emoji requires 4 bytes in UTF-16
-            
+
             // Convert to byte arrays using different encodings, then back to string
             byte[] bmpUtf8 = Encoding.UTF8.GetBytes(bmpChars);
             byte[] bmpUtf16 = Encoding.Unicode.GetBytes(bmpChars);
             byte[] bmpUtf32 = Encoding.UTF32.GetBytes(bmpChars);
-            
+
             byte[] suppUtf8 = Encoding.UTF8.GetBytes(supplementaryChars);
             byte[] suppUtf16 = Encoding.Unicode.GetBytes(supplementaryChars);
             byte[] suppUtf32 = Encoding.UTF32.GetBytes(supplementaryChars);
-            
+
             // Convert back to strings
             string bmpFromUtf8 = Encoding.UTF8.GetString(bmpUtf8);
             string bmpFromUtf16 = Encoding.Unicode.GetString(bmpUtf16);
             string bmpFromUtf32 = Encoding.UTF32.GetString(bmpUtf32);
-            
+
             string suppFromUtf8 = Encoding.UTF8.GetString(suppUtf8);
             string suppFromUtf16 = Encoding.Unicode.GetString(suppUtf16);
             string suppFromUtf32 = Encoding.UTF32.GetString(suppUtf32);
-            
+
             // Test that FuzzySearch is consistent across encodings
             SqlClrFunctions.FuzzySearch(
                 new SqlString(bmpFromUtf8), new SqlString(bmpFromUtf16)).Value.Should().Be(1.0);
-                
+
             SqlClrFunctions.FuzzySearch(
                 new SqlString(bmpFromUtf16), new SqlString(bmpFromUtf32)).Value.Should().Be(1.0);
-                
+
             SqlClrFunctions.FuzzySearch(
                 new SqlString(suppFromUtf8), new SqlString(suppFromUtf16)).Value.Should().Be(1.0);
-                
+
             SqlClrFunctions.FuzzySearch(
                 new SqlString(suppFromUtf16), new SqlString(suppFromUtf32)).Value.Should().Be(1.0);
+        }
+
+        [Fact]
+        public void FuzzySearch_WithPerfectMatch_ShouldReturn1()
+        {
+            // Arrange
+
+            SqlString searchTerm = new SqlString("testing".Build3GramString());
+            SqlString longInput = new SqlString("testing");
+
+            // Act
+            var result = SqlClrFunctions.FuzzySearch(searchTerm, longInput).Value;
+
+            // Assert
+            result.Should().Be(1); // Should match well
+        }
+
+        [Fact]
+        public void FuzzySearch_With2PerfectMatch_ShouldReturn2()
+        {
+            // Arrange
+
+            SqlString searchTerm = new SqlString("testing".Build3GramString());
+            SqlString longInput = new SqlString("testingtesting");
+
+            // Act
+            var result = SqlClrFunctions.FuzzySearch(searchTerm, longInput).Value;
+
+            // Assert
+            result.Should().BeGreaterThan(0.8); // Should match well
         }
     }
 }
