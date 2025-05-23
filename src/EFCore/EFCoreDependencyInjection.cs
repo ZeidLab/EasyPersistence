@@ -25,7 +25,7 @@ public static class EFCoreDependencyInjection
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
-        modelBuilder.HasDbFunction(typeof(HelperMethods).GetMethod(nameof(FuzzySearchExtensions.FuzzySearch),
+        modelBuilder.HasDbFunction(typeof(FuzzySearchExtensions).GetMethod(nameof(FuzzySearchExtensions.FuzzySearch),
                 [typeof(string), typeof(string)]) ?? throw new InvalidOperationException())
             .HasName("FuzzySearch")
             .HasSchema("dbo");
