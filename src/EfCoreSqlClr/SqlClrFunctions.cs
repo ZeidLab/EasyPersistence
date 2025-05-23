@@ -31,28 +31,61 @@ public static class SqlClrFunctions
 
 
         // Normalize the strings to ensure consistent comparison
-        string compared = comparedString.Value.Normalize();
+        string compared = comparedString.Value.Normalize().ToLowerInvariant();
 
 
         // after normalization if the term length is less than 3, return 0
         if (compared.Length < 3)
             return new SqlDouble(0);
 
-        // generate 3-grams from the compared string
-        var comparedGrams = Enumerable.Range(0, compared.Length - 2)
-            .Select(i => compared.Substring(i, 3))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        string[] allGrams = new string[compared.Length - 2];
+        int uniqueCount = 0;
 
-        // count hits
-        var hits = grams.Count(x => comparedGrams.Contains(x));
-        
-        
+        // Fill with unique 3-grams
+        for (int i = 0; i < compared.Length - 2; i++)
+        {
+            string gram = compared.Substring(i, 3);
+
+            // Check if this gram is already in our array
+            bool isDuplicate = false;
+            for (int j = 0; j < uniqueCount; j++)
+            {
+                if (!string.Equals(allGrams[j], gram, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                isDuplicate = true;
+                break;
+            }
+
+            // If not a duplicate, add it
+            if (!isDuplicate)
+            {
+                allGrams[uniqueCount++] = gram;
+            }
+        }
+
+        // Count hits manually
+        int hits = 0;
+        for (int i = 0; i < grams.Length; i++)
+        {
+            for (int j = 0; j < allGrams.Length; j++)
+            {
+                if (string.Equals(grams[i], allGrams[j], StringComparison.OrdinalIgnoreCase))
+                {
+                    hits++;
+                    break;
+                }
+            }
+        }
+
         // If no 3-grams are found, return 0
         if (hits == 0)
             return new SqlDouble(0);
 
         // Calculate the score based on the number of hits and coverage
-        var score = ScoreCalculation(hits, grams.Length, comparedGrams.Count);
+        var score = ScoreCalculation(hits, grams.Length, allGrams.Length);
 
         return new SqlDouble(score);
     }
