@@ -94,9 +94,12 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
 
     public Task<List<ScoredRecord<TEntity>>> FuzzySearchAsync(string searchTerm, params Expression<Func<TEntity, string>>[] fieldsToSearch)
     {
-        return _context.Set<TEntity>()
-            .ApplyFuzzySearch(searchTerm, fieldsToSearch)
-            .ToListAsync();
+        // Example of validating property expressions
+        return fieldsToSearch == null || fieldsToSearch.Any(expr => expr is null)
+            ? throw new ArgumentNullException(nameof(fieldsToSearch), "One or more property expressions are null.")
+            : _context.Set<TEntity>()
+                .ApplyFuzzySearch(searchTerm, fieldsToSearch)
+                .ToListAsync();
     }
 
     public Task<int> InDbUpdatePropertyAsync(Expression<Func<TEntity, bool>> predicate,

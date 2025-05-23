@@ -14,13 +14,21 @@ public static class FuzzySearchExtensions
         string searchTerm,
         params Expression<Func<TEntity, string>>[] propertyExpressions)
     {
-        if (string.IsNullOrEmpty(searchTerm) || propertyExpressions.Length == 0)
+        // Example of validating property expressions
+        if (propertyExpressions == null || propertyExpressions.Any(expr => expr == null))
+        {
+            throw new ArgumentNullException(nameof(propertyExpressions), "One or more property expressions are null.");
+        }
+
+        if (string.IsNullOrEmpty(searchTerm)
+            || propertyExpressions.Length == 0
+            || (searchTerm.Build3GramString() is var normalizedSearchTerm && normalizedSearchTerm.Length < 3))
             return query.Select(x =>
                 new ScoredRecord<TEntity> { Entity = x, Score = 0, Scores = Enumerable.Empty<PropertyScore>() });
 
         // Create the parameter for our entity
         var entityParameter = Expression.Parameter(typeof(TEntity), "entity");
-        var searchTermConstant = Expression.Constant(searchTerm.Build3GramString());
+        var searchTermConstant = Expression.Constant(normalizedSearchTerm);
 
         // Build up expressions for each property
         var propertyScores = propertyExpressions.Select(propExpr =>
@@ -40,7 +48,8 @@ public static class FuzzySearchExtensions
                     typeof(PropertyScore).GetProperty(nameof(PropertyScore.Score))!,
                     Expression.Call(
                         null,
-                        typeof(HelperMethods).GetMethod(nameof(FuzzySearch))!,
+                        typeof(FuzzySearchExtensions).GetMethod(nameof(FuzzySearch),
+                            [typeof(string), typeof(string)]) ?? throw new InvalidOperationException("The FuzzySearch method can not be found"),
                         searchTermConstant,
                         Expression.Coalesce(propertyAccess, Expression.Constant(string.Empty))
                     )
@@ -138,6 +147,4 @@ public static class FuzzySearchExtensions
         // You would typically use this in a LINQ query or similar
         return 0;
     }
-
-    
 }
