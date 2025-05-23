@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-
 using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units;
@@ -13,7 +12,7 @@ public sealed class FuzzySearchExtensionsTests
         // Arrange
         var searchTerm = "123456789";
         // Act
-        var result = searchTerm.Get3Grams();
+        var result = searchTerm.Build3GramString();
         // Assert
         await Verify(result);
     }
