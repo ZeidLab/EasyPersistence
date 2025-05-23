@@ -50,7 +50,7 @@ public static class SqlClrFunctions
             bool isDuplicate = false;
             for (int j = 0; j < uniqueCount; j++)
             {
-                if (!string.Equals(allGrams[j], gram, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(allGrams[j], gram, StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -72,7 +72,7 @@ public static class SqlClrFunctions
         {
             for (int j = 0; j < allGrams.Length; j++)
             {
-                if (string.Equals(grams[i], allGrams[j], StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(grams[i], allGrams[j], StringComparison.Ordinal))
                 {
                     hits++;
                     break;
