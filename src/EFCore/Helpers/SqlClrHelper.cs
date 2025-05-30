@@ -26,7 +26,9 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
                 throw new FileNotFoundException($"SQL CLR assembly not found at: {assemblyPath}");
 
             byte[] assemblyBytes;
-            using (var fileStream = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+#pragma warning disable CAC001
+            await using (var fileStream =
+                         new FileStream(assemblyPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 assemblyBytes = new byte[fileStream.Length];
                 var bytesRead = await fileStream.ReadAsync(assemblyBytes, cancellationToken).ConfigureAwait(false);
@@ -34,8 +36,11 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
                 if (bytesRead != fileStream.Length)
                     throw new IOException("Failed to read complete assembly file");
             }
+#pragma warning restore CAC001
 
-            var assemblyHex = BitConverter.ToString(assemblyBytes).Replace("-", "");            // First enable CLR and set clr strict security to 0
+            var assemblyHex =
+                BitConverter.ToString(assemblyBytes)
+                    .Replace("-", ""); // First enable CLR and set clr strict security to 0
             const string checkConfigSql = @"
                 EXEC sp_configure 'show advanced options', 1;
                 RECONFIGURE;
@@ -112,7 +117,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
                     DROP ASSEMBLY [{assemblyName}];
                 END";
 
-           return context.Database.ExecuteSqlRawAsync(sql);
+            return context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }

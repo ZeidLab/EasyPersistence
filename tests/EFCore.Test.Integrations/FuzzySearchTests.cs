@@ -29,7 +29,7 @@ public sealed class FuzzySearchTests : IAsyncLifetime
         });
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
-        services.AddEFCoreSqlClrMethods(useBackgroundService: false);
+        services.AddEFCoreSqlClrMethods();
         _serviceProvider = services.BuildServiceProvider();
     }
 
