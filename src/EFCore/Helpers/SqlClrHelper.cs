@@ -96,7 +96,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
         /// </summary>
         /// <param name="context">The database context.</param>
         /// <param name="assemblyName">Name of the assembly in SQL Server.</param>
-        public static void RemoveSqlClrAssembly(
+        public static Task RemoveSqlClrAssemblyAsync(
             this DbContext context,
             string assemblyName)
         {
@@ -112,7 +112,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
                     DROP ASSEMBLY [{assemblyName}];
                 END";
 
-            context.Database.ExecuteSqlRaw(sql);
+           return context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }
