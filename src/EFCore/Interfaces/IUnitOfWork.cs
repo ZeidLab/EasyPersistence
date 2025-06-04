@@ -1,7 +1,4 @@
-﻿using System.Data;
-
-using Microsoft.EntityFrameworkCore.Storage;
-
+﻿using Microsoft.EntityFrameworkCore.Storage;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
