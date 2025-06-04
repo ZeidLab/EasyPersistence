@@ -1,56 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
-            Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{4FDD45B2-E2BD-43FA-A3F3-D7CC6F1057E9}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>EFCoreSqlClr.snk</AssemblyOriginatorKeyFile>
-        <FileAlignment>512</FileAlignment>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="System"/>
-        <Reference Include="System.Core"/>
-        <Reference Include="System.Data"/>
-        <Reference Include="System.Xml"/>
-        <Reference Include="Microsoft.SqlServer.Server"/>
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="SqlClrFunctions.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-    </ItemGroup>
-  
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <Import Project="PostBuild.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>EFCoreSqlClr.snk</AssemblyOriginatorKeyFile>
+    <ProjectPublicKey>0024000004800000940000000602000000240000525341310004000001000100b185830d7f9cec89363ae17757478e90669d5152a0adfa0bd0811471c0b7a3d588beee9922ceba93b5cf85a1df44b45b5e8d218ed8a90de321f67337131e5ca9659a34d1567389790d2796c563f62e42f558c6129e6141d7633981e0ac0aba8c9aa06647d1e5a5e3eae7cd92d0fe3bbbcdabf6b8c54187c70d0b164dd51aedd1</ProjectPublicKey>
+  </PropertyGroup>
+  <ItemGroup Label="Test Assembly Attributes">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.UI, PublicKey=$(ProjectPublicKey)</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Integrations, PublicKey=$(ProjectPublicKey)</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Units, PublicKey=$(ProjectPublicKey)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.SqlServer.Server"/>
+  </ItemGroup>
+
+  <Import Project="PostBuild.targets"/>
 </Project>

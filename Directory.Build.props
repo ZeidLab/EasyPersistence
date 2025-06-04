@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-
   <PropertyGroup Label="NuspecSettings">
     <Company>ZeidLabCo</Company>
     <Authors>Zeid Youssefzadeh</Authors>
@@ -11,14 +10,12 @@
     <NeutralLanguage>en</NeutralLanguage> <!-- The default language of the package -->
   </PropertyGroup>
 
-
   <PropertyGroup>
     <OrganizationPrefix>ZeidLab.ToolBox</OrganizationPrefix>
     <ProductName>EasyPersistence</ProductName>
     <RootNamespace>$(OrganizationPrefix).$(ProductName).$(MSBuildProjectName)</RootNamespace>
     <AssemblyName>$(ProductName).$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
-
 
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -32,7 +29,7 @@
     <AccelerateBuildsInVisualStudio>True</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
   <PropertyGroup Label="Main project properties only"
-                 Condition="$(MSBuildProjectDirectory.Contains('src'))">
+                 Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src\'))">
     <AnalysisLevel>latest</AnalysisLevel>
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
@@ -44,8 +41,4 @@
     <Deterministic>True</Deterministic>
     <Features>strict</Features>
   </PropertyGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Link="Properties/BannedSymbols.txt"/>
-    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" Link="Properties/AssemblyInfo.common.cs"/>
-  </ItemGroup>
 </Project>

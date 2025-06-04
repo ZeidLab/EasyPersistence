@@ -1,13 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
-[CLSCompliant(false)] // Mark the class as non-CLS-compliant
 [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
 public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEntityId>
     where TEntity : EntityBase<TEntityId>, IAggregateRoot

@@ -19,6 +19,38 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup Label="Code Analyzers">
+    <PackageReference Include="AsyncMethodNameFixer"/>
+    <PackageReference Include="ConfigureAwaitChecker.Analyzer"/>
+    <PackageReference Include="ConfigureAwaitEnforcer"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"/>
+    <PackageReference Include="Roslynator.Analyzers"/>
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers"/>
+    <PackageReference Include="Roslynator.Formatting.Analyzers"/>
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Meziantou.Analyzer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SecurityCodeScan.VS2019"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Test Assembly Attributes">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.UI</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Integrations</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Test.Units</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Reference the EfCoreSqlClr project -->
