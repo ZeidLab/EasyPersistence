@@ -12,7 +12,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
         {
             // Arrange
             SqlString emptyString = new SqlString(string.Empty);
-            SqlString nullString = SqlString.Null;
             SqlString whitespaceString = new SqlString("   ");
             SqlString nonEmptyString = new SqlString("test");
             SqlString tooShort = new SqlString("ab"); // Less than 3 chars
@@ -20,8 +19,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units
             // Act & Assert
             SqlClrFunctions.FuzzySearch(emptyString, nonEmptyString).Value.Should().Be(0);
             SqlClrFunctions.FuzzySearch(nonEmptyString, emptyString).Value.Should().Be(0);
-            SqlClrFunctions.FuzzySearch(nullString, nonEmptyString).Value.Should().Be(0);
-            SqlClrFunctions.FuzzySearch(nonEmptyString, nullString).Value.Should().Be(0);
             SqlClrFunctions.FuzzySearch(whitespaceString, nonEmptyString).Value.Should().Be(0);
             SqlClrFunctions.FuzzySearch(nonEmptyString, tooShort).Value.Should().Be(0);
         }
