@@ -1,22 +1,10 @@
-﻿using System.Diagnostics.Contracts;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-
-using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
-public static class HelperMethods
+public static class SearchExtensions
 {
-    public static async Task<PagedResult<TEntity>> GetPagedResultsAsync<TEntity>(this IQueryable<TEntity> query,
-        int page, int pageSize) where TEntity : class
-    {
-        var itemsCount = await query.AsNoTracking().LongCountAsync().ConfigureAwait(false);
-        var items = await query.Skip(page * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
-        return new PagedResult<TEntity>(items, itemsCount);
-    }
-
     public static IQueryable<TEntity> ApplySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
@@ -153,15 +141,5 @@ public static class HelperMethods
         {
             return ReferenceEquals(node, _old) ? _new : base.VisitParameter(node);
         }
-    }
-
-    [Pure]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IQueryable<T> WhereIf<T>(
-        this IQueryable<T> queryable, bool condition,
-        Expression<Func<T, bool>> predicate)
-        where T : notnull
-    {
-        return condition ? queryable.Where(predicate) : queryable;
     }
 }

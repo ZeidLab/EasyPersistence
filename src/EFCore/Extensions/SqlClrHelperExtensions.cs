@@ -6,7 +6,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
     /// <summary>
     /// Helper methods for SQL CLR integration.
     /// </summary>
-    internal static class SqlClrHelper
+    internal static class SqlClrHelperExtensions
     {
         /// <summary>
         /// Initializes the SQL CLR assembly in the database using DbContext.

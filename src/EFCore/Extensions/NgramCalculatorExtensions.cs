@@ -1,6 +1,5 @@
-﻿using System.Text;
-
-namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units;
+﻿// ReSharper disable once CheckNamespace
+namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
 internal static class NgramCalculatorExtensions
 {

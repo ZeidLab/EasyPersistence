@@ -4,7 +4,7 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units.Models;
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Units;
 
-public class HelperMethodsTests
+public class SearchExtensionsTests
 {
     [Fact]
     public void WhereIf_TrueCondition_ReturnsFilteredQueryable()

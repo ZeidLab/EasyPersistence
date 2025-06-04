@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 using System.Linq.Expressions;
 
-using ZeidLab.ToolBox.EasyPersistence.EFCore.Helpers;
-
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
@@ -34,7 +32,7 @@ public static class FuzzySearchExtensions
         var propertyScores = propertyExpressions.Select(propExpr =>
         {
             var propertyPath = GetPropertyPath(propExpr);
-            var visitor = new HelperMethods.ParameterReplacer(propExpr.Parameters[0], entityParameter);
+            var visitor = new SearchExtensions.ParameterReplacer(propExpr.Parameters[0], entityParameter);
             var propertyAccess = visitor.Visit(propExpr.Body);
 
             // For the property score, use property name and fuzzy search score
@@ -49,7 +47,8 @@ public static class FuzzySearchExtensions
                     Expression.Call(
                         null,
                         typeof(FuzzySearchExtensions).GetMethod(nameof(FuzzySearch),
-                            [typeof(string), typeof(string)]) ?? throw new InvalidOperationException("The FuzzySearch method can not be found"),
+                            [typeof(string), typeof(string)]) ??
+                        throw new InvalidOperationException("The FuzzySearch method can not be found"),
                         searchTermConstant,
                         Expression.Coalesce(propertyAccess, Expression.Constant(string.Empty))
                     )

@@ -15,12 +15,12 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations;
 
 [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]
 [SuppressMessage("ConfigureAwait", "ConfigureAwaitEnforcer:ConfigureAwaitEnforcer")]
-public sealed class HelperMethodsTests : IAsyncLifetime
+public sealed class SearchExtensionsTests : IAsyncLifetime
 {
     private readonly ServiceProvider _serviceProvider;
     private readonly TestDbGenerator _dbGenerator = TestDbGenerator.GenerateSqlServerOnly();
     //TODO: WriteDown test methods to see the generated expression and SQL queries
-    public HelperMethodsTests()
+    public SearchExtensionsTests()
     {
         var services = new ServiceCollection();
 
