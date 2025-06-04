@@ -2,7 +2,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 
-  
   <PropertyGroup Label="NuspecSettings">
     <Company>ZeidLabCo</Company>
     <Authors>Zeid Youssefzadeh</Authors>
@@ -13,18 +12,22 @@
   </PropertyGroup>
 
 
-
-  
   <PropertyGroup>
-    <RootNamespace>ZeidLab.ToolBox.EasyPersistence.$(MSBuildProjectName)</RootNamespace>
-    <AssemblyName>EasyPersistence.$(MSBuildProjectName)</AssemblyName>
+    <OrganizationPrefix>ZeidLab.ToolBox</OrganizationPrefix>
+    <ProductName>EasyPersistence</ProductName>
+    <RootNamespace>$(OrganizationPrefix).$(ProductName).$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>$(ProductName).$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+
+  <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latestmajor</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Optimize>True</Optimize>
     <!--  This does not make sense at all  -->
-        <NoWarn>NU1900</NoWarn>
+    <NoWarn>NU1900</NoWarn>
     <!--    <NoError>$(NoError)</NoError>-->
     <AccelerateBuildsInVisualStudio>True</AccelerateBuildsInVisualStudio>
   </PropertyGroup>

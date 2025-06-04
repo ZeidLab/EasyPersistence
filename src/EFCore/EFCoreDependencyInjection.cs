@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using ZeidLab.ToolBox.EasyPersistence.EFCore;
 
@@ -16,8 +19,6 @@ public static class EFCoreDependencyInjection
     public static IServiceCollection AddEFCoreSqlClrMethods(
         this IServiceCollection services)
     {
-
-
         return services;
     }
 
@@ -45,12 +46,12 @@ public static class EFCoreDependencyInjection
     /// <typeparam name="TDbContext"></typeparam>
     [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]
     [SuppressMessage("ConfigureAwait", "ConfigureAwaitEnforcer:ConfigureAwaitEnforcer")]
-    public async static Task RegisterSqlClrAssemblyAsync<TDbContext>(this WebApplication app)
+    public async static Task RegisterSqlClrAssemblyAsync<TDbContext>(this IApplicationBuilder app)
         where TDbContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        await using var scope = app.Services.CreateAsyncScope();
+        await using var scope = app.ApplicationServices.CreateAsyncScope();
 
         var services = scope.ServiceProvider;
         var loggerFactory = services.GetRequiredService<ILoggerFactory>();
@@ -58,13 +59,19 @@ public static class EFCoreDependencyInjection
 
         try
         {
+            var applicationLifetime = services.GetRequiredService<IHostApplicationLifetime>();
+            if (applicationLifetime.ApplicationStarted.IsCancellationRequested)
+            {
+                logger.LogWarning("Application has already stopped, skipping SQL CLR assembly registration.");
+                return;
+            }
             var dbContext = services.GetRequiredService<TDbContext>();
             var strategy = dbContext.Database.CreateExecutionStrategy();
             // ReSharper disable once HeapView.CanAvoidClosure
             await strategy.ExecuteAsync(async () =>
             {
                 await using var transaction = await dbContext.Database.BeginTransactionAsync(CancellationToken.None);
-                await dbContext.InitializeSqlClrAsync(cancellationToken: app.Lifetime.ApplicationStarted);
+                await dbContext.InitializeSqlClrAsync(cancellationToken: applicationLifetime.ApplicationStarted);
 
                 await transaction.CommitAsync(CancellationToken.None);
             });
