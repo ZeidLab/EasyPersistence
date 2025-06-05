@@ -18,7 +18,7 @@ public abstract class UnitOfWorkBase<TContext> : IUnitOfWork, IAsyncDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    public virtual Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return Context.SaveChangesAsync(cancellationToken);
     }
