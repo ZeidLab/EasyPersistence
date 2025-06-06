@@ -16,6 +16,6 @@ public class TestDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TestDbContext).Assembly);
-        modelBuilder.RegisterSqlClrMethods();
+        modelBuilder.RegisterFuzzySearchMethods();
     }
 }

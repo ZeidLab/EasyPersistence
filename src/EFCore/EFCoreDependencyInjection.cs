@@ -15,14 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 // ReSharper disable once InconsistentNaming
 public static class EFCoreDependencyInjection
 {
-    // ReSharper disable once InconsistentNaming
-    public static IServiceCollection AddEFCoreSqlClrMethods(
-        this IServiceCollection services)
-    {
-        return services;
-    }
-
-    public static ModelBuilder RegisterSqlClrMethods(
+    public static ModelBuilder RegisterFuzzySearchMethods(
         this ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
@@ -46,7 +39,7 @@ public static class EFCoreDependencyInjection
     /// <typeparam name="TDbContext"></typeparam>
     [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]
     [SuppressMessage("ConfigureAwait", "ConfigureAwaitEnforcer:ConfigureAwaitEnforcer")]
-    public async static Task RegisterSqlClrAssemblyAsync<TDbContext>(this IApplicationBuilder app)
+    public async static Task RegisterFuzzySearchAssemblyAsync<TDbContext>(this IApplicationBuilder app)
         where TDbContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(app);
