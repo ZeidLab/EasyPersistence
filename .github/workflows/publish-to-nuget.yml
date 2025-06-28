@@ -16,9 +16,6 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Install Mono (for .NET Framework builds)
-        run: sudo apt-get update && sudo apt-get install -y mono-complete
-        
       - name: Create temporary NuGet.Config
         run: |
           echo '<?xml version="1.0" encoding="utf-8"?>
@@ -42,7 +39,8 @@ jobs:
         run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
 
       - name: Pack EFCore project (includes EfCoreSqlClr)
-        run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build --output ./artifacts
+        run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build \
+          --output ./artifacts /p:SuppressDependenciesWhenPacking=true
 
 #      - name: Publish package to NuGet
 #        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate

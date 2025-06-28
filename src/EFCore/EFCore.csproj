@@ -9,7 +9,7 @@
     <PublicSignedKey>0024000004800000940000000602000000240000525341310004000001000100d18894997cc753770ca16558e7a1e3e8358f88b84b6359a894ac301204c53706df4f0c4d1041ecf08daadcf03e44f328680cc85702b2785abe3ef02cd84a1c43300c2db16c7c08f9fb5be9082e3fd5e4b2c4dec0972a3efa62a832d493903b0617ee56e401cd6ce7eb8b942bba03a8f8d7d131d636282ed9dcfdffe7f9ec1ce6</PublicSignedKey>
     <!-- Include the build assets in the package -->
     <IncludeBuildOutput>true</IncludeBuildOutput>
-
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <!-- Versioning -->
     <Deterministic>true</Deterministic>
     <VersionBase>1.0</VersionBase>
@@ -104,7 +104,7 @@
 
   <ItemGroup>
     <!-- Reference the EfCoreSqlClr project -->
-    <ProjectReference Include="..\EfCoreSqlClr\EfCoreSqlClr.csproj"/>
+    <ProjectReference Include="..\EfCoreSqlClr\EfCoreSqlClr.csproj" ExcludeAssets="All"/>
   </ItemGroup>
 
   <Target Name="BuildEfCoreSqlClr" BeforeTargets="Build">
@@ -115,7 +115,7 @@
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
     <!-- Copy the EfCoreSqlClr.dll to the output directory with retry logic -->
     <Copy
-      SourceFiles="..\EfCoreSqlClr\bin\Release\EasyPersistence.EfCoreSqlClr.dll"
+      SourceFiles="..\EfCoreSqlClr\bin\Release\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
       DestinationFolder="$(OutputPath)"
       SkipUnchangedFiles="true"
       ContinueOnError="true"
@@ -125,7 +125,7 @@
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
-      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\net48\"/>
+      <None Include="$(OutputPath)\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll" Pack="true" PackagePath="lib\net48\"/>
     </ItemGroup>
   </Target>
 </Project>

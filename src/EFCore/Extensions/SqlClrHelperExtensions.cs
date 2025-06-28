@@ -23,7 +23,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
             const string assemblyName = "EFCoreSqlClr";
-            var assemblyPath = Path.Combine(AppContext.BaseDirectory, "EasyPersistence.EFCoreSqlClr.dll");
+            var assemblyPath = Path.Combine(AppContext.BaseDirectory, "ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll");
 
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException($"SQL CLR assembly not found at: {assemblyPath}");
