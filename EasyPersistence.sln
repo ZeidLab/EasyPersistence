@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		Directory.Packages.props = Directory.Packages.props
 		nuget.config = nuget.config
 		global.json = global.json
+		.github\COPILOT.md = .github\COPILOT.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9A93824F-1E1C-435A-A424-13CD43614A0A}"
