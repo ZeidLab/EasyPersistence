@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
@@ -16,6 +17,24 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 public abstract class EntityBase<TId> : IEquatable<EntityBase<TId>>
     where TId : notnull
 {
+    /// <summary>
+    /// Gets the collection of domain events associated with this entity.
+    /// </summary>
+    /// <remarks>
+    /// Use this collection to track domain events that should be published after persistence.
+    /// </remarks>
+    /// <example>
+    /// <code><![CDATA[
+    /// entity.DomainEvents.Add(new EntityCreatedEvent(entity));
+    /// foreach (var domainEvent in entity.DomainEvents)
+    /// {
+    ///     // Publish or handle domain event
+    /// }
+    /// ]]></code>
+    /// </example>
+    [NotMapped]
+    public IList<IDomainEvent> DomainEvents { get; } = [];
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EntityBase{TId}"/> class with the specified identifier.
     /// </summary>
