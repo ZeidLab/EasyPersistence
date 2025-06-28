@@ -21,12 +21,12 @@
     <PackageVersion>$(Version)</PackageVersion>
     <Title>ZeidLab EasyPersistence EFCore</Title> <!-- A friendly title for your package -->
     <Product>EasyPersistence.EFCore</Product> <!-- The product name -->
-    <Description>EventBuss is a high-performance, lightweight in-process messaging library for .NET applications. It provides a streamlined approach to implementing the mediator pattern using System.Threading.Channels for efficient event publishing and handling. Designed as a simpler alternative to MediatR, EventBuss enables clean separation of concerns with minimal overhead, making it ideal for implementing CQRS patterns and event-driven architectures without the complexity of pipelines.</Description>
+    <Description>EasyPersistence.EFCore extends Entity Framework Core with high-performance repository and unit of work patterns, advanced fuzzy search and n-gram extensions, and SQL CLR integration for efficient search. Designed for scalable, maintainable, and testable .NET data layers, it follows modern C# and Microsoft coding standards, with comprehensive XML documentation and NuGet-ready modularity.</Description>
     <PackageTags>
-      mediator events cqrs event-driven messaging in-process-messaging channels request-response event-handling command-query-responsibility-segregation dotnet netstandard
+      entity-framework-core efcore repository-pattern unit-of-work fuzzy-search ngram sqlclr extensions data-access dotnet persistence orm csharp12 nuget
     </PackageTags>
-    <PackageProjectUrl>https://github.com/ZeidLab/EventBuss</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ZeidLab/EventBuss</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ZeidLab/EasyPersistence</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ZeidLab/EasyPersistence</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression> <!-- Specify the license type -->
 
