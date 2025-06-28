@@ -5,35 +5,47 @@ on:
 
 jobs:
   build-sign-pack-publish:
-    runs-on: windows-latest
+    runs-on: windows-latest # 👈 Use Windows for .NET Framework & SqlServer.Server compatibility
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-         
-      - name: Setup .NET
+
+      - name: Setup .NET 9 SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies EFCore
+      # Mono is unnecessary on Windows runners — .NET Framework MSBuild is native on Windows
+
+      - name: Restore EFCore dependencies
         run: dotnet restore src/EFCore/EFCore.csproj
 
-      - name: Restore dependencies EfCoreSqlClr
+      - name: Restore EfCoreSqlClr dependencies
         run: dotnet restore src/EfCoreSqlClr/EfCoreSqlClr.csproj
 
-      - name: Build EfCoreSqlClr to make sure it works fine
+      - name: Build EfCoreSqlClr (net48)
         run: dotnet build src/EfCoreSqlClr/EfCoreSqlClr.csproj --configuration Release --no-restore
-      
-      - name: Build EFCore project (Release, signed)
+
+      - name: Build EFCore (net9.0) with SQL CLR included
         run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
 
-      - name: Pack EFCore project (includes EfCoreSqlClr)
-        run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build --output ./artifacts -p:SuppressDependenciesWhenPacking=true
+      - name: Pack EFCore (embed EfCoreSqlClr.dll)
+        run: |
+          dotnet pack src/EFCore/EFCore.csproj `
+            --configuration Release `
+            --no-build `
+            --output ${{ github.workspace }}/artifacts `
+            -p:SuppressDependenciesWhenPacking=true
 
-      - name: Publish package to NuGet
-        run: dotnet nuget push artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-    
-      - name: Publish symbols package to NuGet
-        run: dotnet nuget push artifacts/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: List final package outputs
+        run: |
+          echo "Working directory: $PWD"
+          dir
+          dir artifacts
 
+      - name: Publish NuGet package
+        run: dotnet nuget push "${{ github.workspace }}/artifacts/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Publish symbols package
+        run: dotnet nuget push "${{ github.workspace }}/artifacts/*.snupkg" --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
