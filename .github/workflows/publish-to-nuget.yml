@@ -31,11 +31,9 @@ jobs:
       - name: Pack EFCore project (includes EfCoreSqlClr)
         run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build --output ./artifacts -p:SuppressDependenciesWhenPacking=true
 
-
-
       - name: Publish package to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
+        run: dotnet nuget push artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    
       - name: Publish symbols package to NuGet
-        run: dotnet nuget push ./artifacts/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push artifacts/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
