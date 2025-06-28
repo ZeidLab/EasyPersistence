@@ -9,8 +9,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 /// <remarks>
 /// These methods enable scoring and ranking of entities based on similarity to a search term, using SQL CLR or in-memory logic.
 /// </remarks>
-
-
 public static class FuzzySearchExtensions
 {
     /// <summary>

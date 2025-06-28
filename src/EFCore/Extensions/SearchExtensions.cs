@@ -7,8 +7,6 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 /// <remarks>
 /// Enables dynamic search across multiple properties using property names or expressions.
 /// </remarks>
-
-
 public static class SearchExtensions
 {
     /// <summary>
