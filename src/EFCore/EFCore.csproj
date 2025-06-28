@@ -115,13 +115,13 @@
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
     <!-- Copy the EfCoreSqlClr.dll to the output directory with retry logic -->
     <Copy
-      SourceFiles="..\EfCoreSqlClr\bin\Release\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
+      SourceFiles="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
       DestinationFolder="$(OutputPath)"
       SkipUnchangedFiles="true"
       ContinueOnError="true"
       RetryDelayMilliseconds="500"
-      Retries="5">
-    </Copy>
+      Retries="5"/>
+
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>

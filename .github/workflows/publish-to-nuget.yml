@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-sign-pack-publish:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -16,21 +16,11 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Create temporary NuGet.Config
-        run: |
-          echo '<?xml version="1.0" encoding="utf-8"?>
-          <configuration>
-              <packageSources>
-                  <clear />
-                  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-              </packageSources>
-          </configuration>' > ./nuget.config
-
       - name: Restore dependencies EFCore
-        run: dotnet restore src/EFCore/EFCore.csproj --configfile ./nuget.config
+        run: dotnet restore src/EFCore/EFCore.csproj
 
       - name: Restore dependencies EfCoreSqlClr
-        run: dotnet restore src/EfCoreSqlClr/EfCoreSqlClr.csproj --configfile ./nuget.config
+        run: dotnet restore src/EfCoreSqlClr/EfCoreSqlClr.csproj
 
       - name: Build EfCoreSqlClr to make sure it works fine
         run: dotnet build src/EfCoreSqlClr/EfCoreSqlClr.csproj --configuration Release --no-restore
@@ -39,8 +29,13 @@ jobs:
         run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
 
       - name: Pack EFCore project (includes EfCoreSqlClr)
-        run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build \
-          --output ./artifacts /p:SuppressDependenciesWhenPacking=true
+        run: |
+          dotnet pack src/EFCore/EFCore.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./artifacts \
+            -p:SuppressDependenciesWhenPacking=true
+
 
 #      - name: Publish package to NuGet
 #        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
