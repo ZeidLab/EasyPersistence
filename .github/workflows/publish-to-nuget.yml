@@ -10,7 +10,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+  
+      - name: Install Mono (for .NET Framework builds)
+        run: sudo apt-get update && sudo apt-get install -y mono-complete
+        
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -26,17 +29,24 @@ jobs:
               </packageSources>
           </configuration>' > ./nuget.config
 
-      - name: Restore dependencies
+      - name: Restore dependencies EFCore
         run: dotnet restore src/EFCore/EFCore.csproj --configfile ./nuget.config
 
+      - name: Restore dependencies EfCoreSqlClr
+        run: dotnet restore src/EfCoreSqlClr/EfCoreSqlClr.csproj --configfile ./nuget.config
+
+      - name: Build EfCoreSqlClr to make sure it works fine
+        run: dotnet build src/EfCoreSqlClr/EfCoreSqlClr.csproj --configuration Release --no-restore
+      
       - name: Build EFCore project (Release, signed)
         run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
 
       - name: Pack EFCore project (includes EfCoreSqlClr)
         run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build --output ./artifacts
 
-      - name: Publish package to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
-      - name: Publish symbols package to NuGet
-        run: dotnet nuget push ./artifacts/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+#      - name: Publish package to NuGet
+#        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+#
+#      - name: Publish symbols package to NuGet
+#        run: dotnet nuget push ./artifacts/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+#  
