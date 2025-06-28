@@ -12,9 +12,9 @@
 
   <PropertyGroup>
     <OrganizationPrefix>ZeidLab.ToolBox</OrganizationPrefix>
-    <ProductName>EasyPersistence</ProductName>
-    <RootNamespace>$(OrganizationPrefix).$(ProductName).$(MSBuildProjectName)</RootNamespace>
-    <AssemblyName>$(ProductName).$(MSBuildProjectName)</AssemblyName>
+    <ProductGroupName>EasyPersistence</ProductGroupName>
+    <RootNamespace>$(OrganizationPrefix).$(ProductGroupName).$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>$(RootNamespace)</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>
