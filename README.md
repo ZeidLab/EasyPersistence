@@ -1,66 +1,89 @@
+# ZeidLab.ToolBox.EventBuss
 
+## 🤔 What is `EasyPersistence` Library?
 
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+**EasyPersistence** is a high-performance, modular extension for Entity Framework Core, providing advanced repository and unit of work patterns, fuzzy search with 3-gram algorithm, and SQL CLR integration. Designed for scalable, maintainable, and testable .NET data layers, it follows modern C# and Microsoft coding standards, with comprehensive XML documentation and NuGet-ready modularity.
 
-public sealed class DomainEventPublishingInterceptor : SaveChangesInterceptor
-{
-    private readonly IEventBussService _eventBuss;
+### 🎁 Features
 
-    public DomainEventPublishingInterceptor(IEventBussService eventBussService)
-    {
-        _eventBuss = eventBussService;
-    }
+- **Repository & Unit of Work Patterns:** Clean abstractions for data access
+- **Fuzzy Search:** Advanced search capabilities for EF Core with 3-gram algorithm
+- **SQL CLR Integration:** Efficient search via SQL CLR functions
+- **High Performance:** Optimized for critical paths, minimal overhead
 
-    public override async ValueTask<InterceptionResult<int>> SavedChangesAsync(
-        SaveChangesCompletedEventData eventData,
-        InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
-    {
-        var context = eventData.Context;
-        if (context is null) return result;
+[^ Back To Top](#-what-is-EasyPersistence-library)
 
-        var entities = context.ChangeTracker.Entries<EntityBase<int>>()
-            .Where(e => e.Entity.DomainEvents.Count > 0)
-            .Select(e => e.Entity)
-            .ToList();
+## 📦 Installation
 
-        foreach (var entity in entities)
-        {
-            foreach (var domainEvent in entity.DomainEvents)
-            {
-                await _eventBuss.PublishAsync(domainEvent, cancellationToken);
-            }
-            entity.DomainEvents.Clear();
-        }
+To use **EasyPersistence.EFCore** in your project, you can install it via NuGet:
 
-        return result;
-    }
-}
+```bash
+dotnet add package ZeidLab.ToolBox.EasyPersistence.EFCore
 ```
 
+For more information, please visit [EventBuss Package on NuGet](https://www.nuget.org/packages/ZeidLab.ToolBox.EasyPersistence.EFcore).
 
-```csharp
-services.AddScoped<DomainEventPublishingInterceptor>();
+[^ Back To Top](#-what-is-EasyPersistence-library)
 
-services.AddDbContext<MyDbContext>((serviceProvider, options) =>
-{
-    var interceptor = serviceProvider.GetRequiredService<DomainEventPublishingInterceptor>();
-    options.AddInterceptors(interceptor);
-    // Other options...
-});
-```
-Or, if configuring directly in your DbContext:
+## 📝 ChangeLogs
 
-```csharp
-services.AddScoped<DomainEventPublishingInterceptor>();
+With each release, we add new features and fix bugs. You can find the full changelog at [EasyPersistence Releases](https://github.com/ZeidLab/EasyPersistence/releases).
 
-services.AddDbContext<MyDbContext>((serviceProvider, options) =>
-{
-    var interceptor = serviceProvider.GetRequiredService<DomainEventPublishingInterceptor>();
-    options.AddInterceptors(interceptor);
-    // Other options...
-});
-```
+[^ Back To Top](#-what-is-EasyPersistence-library)
 
+## 📖 Usage and Configuration
+
+For more information and detailed usage instructions, please refer to the [EasyPersistence Documentation](https://github.com/ZeidLab/EasyPersistence/index.md).
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
+
+### Core Components
+
+| Component                             | Description                                                  |
+|---------------------------------------|--------------------------------------------------------------|
+| `IEventBussService`                   | Core service for publishing events and sending requests      |
+| `IAppEvent`                           | Marker interface for event objects                           |
+| `IAppEventHandler<T>`                 | Interface for event handlers                                 |
+| `IRequest<TResponse>`                 | Interface for request objects that expect a response         |
+| `IRequest`                            | Interface for request objects that don't expect a response   |
+| `IRequestHandler<TRequest,TResponse>` | Interface for request handlers that return a response        |
+| `IRequestHandler<TRequest>`           | Interface for request handlers that do not return a response |
+| `EventBussOptions`                    | Configuration options for EventBuss                          |
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
+## ⭐️ Star and Follow
+
+Star this repository and follow me on GitHub to stay informed about new releases and updates. Your support fuels this
+project's growth!
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
+## 💡 Love My Work? Support the Journey!
+
+If my content adds value to your projects, consider supporting me via crypto.
+
+- **Bitcoin:** bc1qlfljm9mysdtu064z5cf4yq4ddxgdfztgvghw3w
+- **USDT(TRC20):** TJFME9tAnwdnhmqGHDDG5yCs617kyQDV39
+
+Thank you for being part of this community—let’s build smarter, together
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
+## 🤝 Contributions
+
+Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
+
+1. Fork the repository
+2. Create a new branch for your feature or bugfix
+3. Commit your changes following the project guidelines
+4. Push your branch and submit a pull request
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE.txt) file for details.
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
