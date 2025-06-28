@@ -44,8 +44,16 @@ jobs:
           dir
           dir artifacts
 
-      - name: Publish NuGet package
-        run: dotnet nuget push "${{ github.workspace }}/artifacts/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish NuGet packages
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
-      - name: Publish symbols package
-        run: dotnet nuget push "${{ github.workspace }}/artifacts/*.snupkg" --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish symbols packages
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.snupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
