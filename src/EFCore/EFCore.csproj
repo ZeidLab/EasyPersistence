@@ -20,15 +20,15 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Label="Code Analyzers">
-    <PackageReference Include="AsyncMethodNameFixer"/>
-    <PackageReference Include="ConfigureAwaitChecker.Analyzer"/>
-    <PackageReference Include="ConfigureAwaitEnforcer"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"/>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"/>
-    <PackageReference Include="Roslynator.Analyzers"/>
-    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers"/>
-    <PackageReference Include="Roslynator.Formatting.Analyzers"/>
+    <PackageReference Include="AsyncMethodNameFixer" PrivateAssets="All"/>
+    <PackageReference Include="ConfigureAwaitChecker.Analyzer"  PrivateAssets="All" />
+    <PackageReference Include="ConfigureAwaitEnforcer" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="All" />
+    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="Roslynator.Formatting.Analyzers" PrivateAssets="All" />
     <PackageReference Include="SonarAnalyzer.CSharp">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,7 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SecurityCodeScan.VS2019"/>
+    <PackageReference Include="SecurityCodeScan.VS2019" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Label="Test Assembly Attributes">
