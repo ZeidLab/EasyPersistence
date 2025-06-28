@@ -25,6 +25,23 @@ For more information, please visit [EventBuss Package on NuGet](https://www.nuge
 
 [^ Back To Top](#-what-is-EasyPersistence-library)
 
+### Core Components
+
+| Component                           | Description                                                    |
+|-------------------------------------|----------------------------------------------------------------|
+| `IAggregateRoot`                    | Marker for aggregate root entities in the domain model         |
+| `IDomainEvent`                      | Marker for domain events in DDD                                |
+| `IRepositoryBase`                   | Generic repository interface for entity data access            |
+| `IUnitOfWork`                       | Unit of work contract for managing transactions and saving     |
+| `EntityBase<TId>`                   | Base class for entities with typed ID and value-based equality |
+| `PagedResult<T>`                    | Represents a paged result set with items and total count       |
+| `PropertyScore`                     | Represents the score of a property in fuzzy search/comparison  |
+| `ScoredRecord<TEntity>`             | Entity with fuzzy search score and per-property scores         |
+| `UnitOfWorkBase<TContext>`          | Base implementation of IUnitOfWork for EF Core DbContext       |
+| `RepositoryBase<TEntity,TEntityId>` | Base implementation of IRepositoryBase using EF Core           |
+
+[^ Back To Top](#-what-is-EasyPersistence-library)
+
 ## 📝 ChangeLogs
 
 With each release, we add new features and fix bugs. You can find the full changelog at [EasyPersistence Releases](https://github.com/ZeidLab/EasyPersistence/releases).
@@ -37,21 +54,6 @@ For more information and detailed usage instructions, please refer to the [EasyP
 
 [^ Back To Top](#-what-is-EasyPersistence-library)
 
-
-### Core Components
-
-| Component                             | Description                                                  |
-|---------------------------------------|--------------------------------------------------------------|
-| `IEventBussService`                   | Core service for publishing events and sending requests      |
-| `IAppEvent`                           | Marker interface for event objects                           |
-| `IAppEventHandler<T>`                 | Interface for event handlers                                 |
-| `IRequest<TResponse>`                 | Interface for request objects that expect a response         |
-| `IRequest`                            | Interface for request objects that don't expect a response   |
-| `IRequestHandler<TRequest,TResponse>` | Interface for request handlers that return a response        |
-| `IRequestHandler<TRequest>`           | Interface for request handlers that do not return a response |
-| `EventBussOptions`                    | Configuration options for EventBuss                          |
-
-[^ Back To Top](#-what-is-EasyPersistence-library)
 
 ## ⭐️ Star and Follow
 

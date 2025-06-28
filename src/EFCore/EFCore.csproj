@@ -45,6 +45,12 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
   </PropertyGroup>
+  
+  <ItemGroup Label="Documentation and Source Files">
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions"/>
@@ -119,7 +125,7 @@
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
-      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\netstandard2.0\"/>
+      <None Include="$(OutputPath)\EasyPersistence.EfCoreSqlClr.dll" Pack="true" PackagePath="lib\net48\"/>
     </ItemGroup>
   </Target>
 </Project>

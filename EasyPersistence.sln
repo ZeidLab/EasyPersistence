@@ -37,6 +37,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 		.github\workflows\publish-to-nuget.yml = .github\workflows\publish-to-nuget.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{4BE8F2F3-2D6E-4660-A137-D4F9A177F66E}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\Useing-Domain-Events.md = Docs\Useing-Domain-Events.md
+		Docs\Index.md = Docs\Index.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
