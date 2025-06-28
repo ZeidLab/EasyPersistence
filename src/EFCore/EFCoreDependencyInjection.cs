@@ -12,9 +12,25 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore;
 namespace Microsoft.Extensions.DependencyInjection;
 #pragma warning restore IDE0130
 
+/// <summary>
+/// Provides extension methods for integrating EasyPersistence EFCore features into dependency injection and model configuration.
+/// </summary>
+/// <remarks>
+/// Use these methods to register FuzzySearch SQL CLR and EF Core model extensions in your application startup.
+/// </remarks>
 // ReSharper disable once InconsistentNaming
 public static class EFCoreDependencyInjection
 {
+    /// <summary>
+    /// Registers the FuzzySearch SQL function with the EF Core model builder.
+    /// </summary>
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/> instance to extend.</param>
+    /// <returns>The same <see cref="ModelBuilder"/> instance for chaining.</returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// modelBuilder.RegisterFuzzySearchMethods();
+    /// ]]></code>
+    /// </example>
     public static ModelBuilder RegisterFuzzySearchMethods(
         this ModelBuilder modelBuilder)
     {
@@ -28,13 +44,10 @@ public static class EFCoreDependencyInjection
         return modelBuilder;
     }
 
-    /// <summary>
-    /// Registers SQL CLR assembly for the specified DbContext.
-    /// if the assembly is not already registered, it will be deployed to the database.
-    /// if the assembly is already registered, it will ignore the request.
-    /// If there is multiple DbContext, you only need to call this method once with one of the DbContexts.
-    /// If there is multiple SqlServer instances, you need to call this for each instance only once.
-    /// </summary>
+    /// <inheritdoc cref="RegisterFuzzySearchAssemblyAsync{TDbContext}(IApplicationBuilder)"/>
+    /// <remarks>
+    /// This method should be called during application startup to ensure the SQL CLR assembly is registered.
+    /// </remarks>
     /// <param name="app"></param>
     /// <typeparam name="TDbContext"></typeparam>
     [SuppressMessage("Code", "CAC001:ConfigureAwaitChecker")]

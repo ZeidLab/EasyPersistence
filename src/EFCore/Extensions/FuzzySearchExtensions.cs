@@ -1,12 +1,36 @@
 using Microsoft.EntityFrameworkCore;
 
 using System.Linq.Expressions;
-
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
+/// <summary>
+/// Provides extension methods for performing fuzzy search operations on <see cref="IQueryable{TEntity}"/> sources.
+/// </summary>
+/// <remarks>
+/// These methods enable scoring and ranking of entities based on similarity to a search term, using SQL CLR or in-memory logic.
+/// </remarks>
+
 
 public static class FuzzySearchExtensions
 {
+    /// <summary>
+    /// Applies fuzzy search scoring to the specified query using the provided search term and string properties.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
+    /// <param name="query">The source query to apply fuzzy search to.</param>
+    /// <param name="searchTerm">The term to compare against entity properties.</param>
+    /// <param name="propertyExpressions">One or more expressions selecting string properties to search.</param>
+    /// <returns>
+    /// An <see cref="IQueryable{T}"/> of <see cref="ScoredRecord{TEntity}"/> with entities and their fuzzy search scores.
+    /// </returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// var results = dbContext.People
+    ///     .ApplyFuzzySearch("john", x => x.FirstName, x => x.LastName)
+    ///     .OrderByDescending(x => x.Score)
+    ///     .ToList();
+    /// ]]></code>
+    /// </example>
     public static IQueryable<ScoredRecord<TEntity>> ApplyFuzzySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
@@ -124,6 +148,26 @@ public static class FuzzySearchExtensions
         return query.Select(lambda);
     }
 
+    /// <summary>
+    /// Computes a fuzzy similarity score between a search term and a string for use in SQL queries.
+    /// </summary>
+    /// <param name="searchTerm">The term to search for.</param>
+    /// <param name="comparedString">The string to compare against the search term.</param>
+    /// <returns>A similarity score between 0 and 1, where higher is more similar.</returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// var score = FuzzySearchExtensions.FuzzySearch("john", "jonathan");
+    /// // Used in LINQ-to-Entities queries for scoring
+    /// ]]></code>
+    /// </example>
+    [DbFunction("FuzzySearch", schema: "dbo")]
+    public static double FuzzySearch(string searchTerm, string comparedString)
+    {
+        // This is a placeholder for the actual implementation
+        // You would typically use this in a LINQ query or similar
+        return 0;
+    }
+
     // Get property path from expression like x => x.Property or x => x.NestedObject.Property
     private static string GetPropertyPath<TEntity>(Expression<Func<TEntity, string>> propertyExpression)
     {
@@ -137,13 +181,5 @@ public static class FuzzySearchExtensions
         }
 
         return string.Join(".", path);
-    }
-
-    [DbFunction("FuzzySearch", schema: "dbo")]
-    public static double FuzzySearch(string searchTerm, string comparedString)
-    {
-        // This is a placeholder for the actual implementation
-        // You would typically use this in a LINQ query or similar
-        return 0;
     }
 }

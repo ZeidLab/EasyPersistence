@@ -9,10 +9,13 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
     internal static class SqlClrHelperExtensions
     {
         /// <summary>
-        /// Initializes the SQL CLR assembly in the database using DbContext.
+        /// Initializes the SQL CLR assembly in the database using the provided <see cref="DbContext"/>.
         /// </summary>
-        /// <param name="context">The database context.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="context">The database context used for SQL execution.</param>
+        /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
+        /// <remarks>
+        /// This method enables CLR integration and deploys the required assembly if not already present.
+        /// </remarks>
         public static async Task InitializeSqlClrAsync(
             this DbContext context,
             CancellationToken cancellationToken = default)

@@ -1,10 +1,29 @@
 ﻿using System.Linq.Expressions;
-
 // ReSharper disable once CheckNamespace
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
+/// <summary>
+/// Provides extension methods for searching string properties in <see cref="IQueryable{TEntity}"/> sources.
+/// </summary>
+/// <remarks>
+/// Enables dynamic search across multiple properties using property names or expressions.
+/// </remarks>
+
 
 public static class SearchExtensions
 {
+    /// <summary>
+    /// Filters the query by searching for the <paramref name="searchTerm"/> in the specified string property names.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
+    /// <param name="query">The source query to filter.</param>
+    /// <param name="searchTerm">The term to search for in the properties.</param>
+    /// <param name="propertyNames">The names of the string properties to search.</param>
+    /// <returns>A filtered <see cref="IQueryable{TEntity}"/> containing entities where any property contains the search term.</returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// var results = dbContext.People.ApplySearch("john", "FirstName", "LastName").ToList();
+    /// ]]></code>
+    /// </example>
     public static IQueryable<TEntity> ApplySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
@@ -63,6 +82,19 @@ public static class SearchExtensions
         return query.Where(lambda);
     }
 
+    /// <summary>
+    /// Filters the query by searching for the <paramref name="searchTerm"/> in the specified string property expressions.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
+    /// <param name="query">The source query to filter.</param>
+    /// <param name="searchTerm">The term to search for in the properties.</param>
+    /// <param name="propertyExpressions">Expressions selecting the string properties to search.</param>
+    /// <returns>A filtered <see cref="IQueryable{TEntity}"/> containing entities where any property contains the search term.</returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// var results = dbContext.People.ApplySearch("john", x => x.FirstName, x => x.LastName).ToList();
+    /// ]]></code>
+    /// </example>
     public static IQueryable<TEntity> ApplySearch<TEntity>(
         this IQueryable<TEntity> query,
         string searchTerm,
