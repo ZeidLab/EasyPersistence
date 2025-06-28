@@ -29,12 +29,8 @@ jobs:
         run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
 
       - name: Pack EFCore project (includes EfCoreSqlClr)
-        run: |
-          dotnet pack src/EFCore/EFCore.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./artifacts \
-            -p:SuppressDependenciesWhenPacking=true
+        run: dotnet pack src/EFCore/EFCore.csproj --configuration Release --no-build --output ./artifacts -p:SuppressDependenciesWhenPacking=true
+
 
 
 #      - name: Publish package to NuGet
