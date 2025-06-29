@@ -124,7 +124,7 @@
     <ItemGroup>
       <None Include="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
             Pack="true"
-            PackagePath="lib\net48\" />
+            PackagePath="lib\netstandard2.0\" />
     </ItemGroup>
   </Target>
 </Project>
