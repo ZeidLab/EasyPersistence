@@ -9,14 +9,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET 9 SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      
+      #  verify installed SDKs
+      - name: Show installed .NET SDKs
+        run: dotnet --list-sdks
 
-      # Mono is unnecessary on Windows runners — .NET Framework MSBuild is native on Windows
 
       - name: Restore EFCore dependencies
         run: dotnet restore src/EFCore/EFCore.csproj
