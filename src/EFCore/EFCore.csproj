@@ -111,18 +111,20 @@
 
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
     <!-- Copy the EfCoreSqlClr.dll to the output directory with retry logic -->
-    <Copy
-      SourceFiles="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
-      DestinationFolder="$(OutputPath)"
-      SkipUnchangedFiles="true"
-      ContinueOnError="true"
-      RetryDelayMilliseconds="500"
-      Retries="5"/>
+   <Copy
+        SourceFiles="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
+        DestinationFolder="$(OutputPath)"
+        SkipUnchangedFiles="true"
+        ContinueOnError="true"
+        RetryDelayMilliseconds="500"
+        Retries="5"/>
 
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
-      <None Include="$(OutputPath)\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll" Pack="true" PackagePath="lib\net48\"/>
+      <None Include="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
+            Pack="true"
+            PackagePath="lib\net48\" />
     </ItemGroup>
   </Target>
 </Project>

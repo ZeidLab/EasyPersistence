@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
-      </PropertyGroup>
+  </PropertyGroup>
   <ItemGroup Label="Test Assembly Attributes">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>$(AssemblyName).Test.UI</_Parameter1>
@@ -20,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServer.Server" Version="1.0.0"/>
+    <PackageReference Include="Microsoft.SqlServer.Server"/>
   </ItemGroup>
 
   <Import Project="PostBuild.targets"/>

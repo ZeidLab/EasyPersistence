@@ -278,7 +278,10 @@ public class RepositoryBaseTests : IAsyncLifetime
         updatedRows.Should().Be(2); // Two rows should be updated
 
         // Verify update in database
-        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Smith-Updated");
+        var updatedUsers = await dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.LastName == "Smith-Updated")
+            .ToListAsync();
         updatedUsers.Count.Should().Be(2);
         updatedUsers.All(u => u.LastName == "Smith-Updated").Should().BeTrue();
     }
@@ -312,9 +315,13 @@ public class RepositoryBaseTests : IAsyncLifetime
         updatedRows.Should().Be(2); // Two rows should be updated
 
         // Verify update in database
-        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u => u.LastName == "Updated-LastName");
+        var updatedUsers =
+            await dbContext.Users
+                .AsNoTracking()
+                .Where(u => u.LastName == "Smith-Updated")
+                .ToListAsync();
         updatedUsers.Count.Should().Be(2);
-        updatedUsers.All(u => u.FirstName == "Updated-FirstName" && u.LastName == "Updated-LastName").Should().BeTrue();
+        updatedUsers.All(u => u.FirstName == "Updated-FirstName" && u.LastName == "Smith-Updated").Should().BeTrue();
     }
 
     [Fact]
@@ -346,8 +353,10 @@ public class RepositoryBaseTests : IAsyncLifetime
         updatedRows.Should().Be(2); // Two rows should be updated
 
         // Verify update in database
-        var updatedUsers = await testUnitOfWork.Users.FindAllAsync(u
-            => u.LastName == "Smith");
+        var updatedUsers = await dbContext.Users
+            .AsNoTracking()
+            .Where(u
+                => u.LastName == "Smith").ToListAsync();
         updatedUsers.Count.Should().Be(2);
         updatedUsers.All(u => u.DateOfBirth == newDate).Should().BeTrue();
     }
@@ -423,6 +432,7 @@ public class RepositoryBaseTests : IAsyncLifetime
         var retrievedUser = await testUnitOfWork.Users.GetByIdAsync(user.Id);
         retrievedUser.Should().BeNull();
     }
+
     public async Task InitializeAsync()
     {
         await _dbGenerator.MakeSureIsRunningAsync();

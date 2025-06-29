@@ -95,14 +95,14 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
     {
         return _context.Set<TEntity>()
             .Where(predicate)
-            .GetPagedResultsAsync(_context,page, pageSize);
+            .GetPagedResultsAsync(page, pageSize);
     }
 
     /// <inheritdoc/>
     public Task<PagedResult<TEntity>> GetPagedResultsAsync(int page, int pageSize)
     {
         return _context.Set<TEntity>()
-            .GetPagedResultsAsync(_context,page, pageSize);
+            .GetPagedResultsAsync(page, pageSize);
     }
 
     /// <inheritdoc/>
@@ -112,7 +112,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
     {
         return _context.Set<TEntity>().Where(predicate)
             .ApplySearch(searchTerm, fieldsToSearch)
-            .GetPagedResultsAsync(_context,page, pageSize);
+            .GetPagedResultsAsync(page, pageSize);
     }
 
     /// <inheritdoc/>
@@ -121,7 +121,7 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
     {
         return _context.Set<TEntity>()
             .ApplySearch(searchTerm, fieldsToSearch)
-            .GetPagedResultsAsync(_context,page, pageSize);
+            .GetPagedResultsAsync(page, pageSize);
     }
 
     /// <inheritdoc/>

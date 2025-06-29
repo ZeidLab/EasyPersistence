@@ -20,8 +20,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore
             this DbContext context,
             CancellationToken cancellationToken = default)
         {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
             const string assemblyName = "EFCoreSqlClr";
             var assemblyPath = Path.Combine(AppContext.BaseDirectory, "ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll");
 

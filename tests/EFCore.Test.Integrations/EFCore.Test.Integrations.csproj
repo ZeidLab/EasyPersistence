@@ -14,7 +14,11 @@
     <ProjectReference Include="..\..\src\EFCore\EFCore.csproj" />
     <ProjectReference Include="..\TestHelpers\TestHelpers.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="..\..\src\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
