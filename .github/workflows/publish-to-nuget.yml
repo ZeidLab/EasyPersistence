@@ -16,10 +16,6 @@ jobs:
         with:
           dotnet-version: '9.0.x'
       
-      #  verify installed SDKs
-      - name: Show installed .NET SDKs
-        run: dotnet --list-sdks
-
 
       - name: Restore EFCore dependencies
         run: dotnet restore src/EFCore/EFCore.csproj
@@ -28,16 +24,15 @@ jobs:
         run: dotnet restore src/EfCoreSqlClr/EfCoreSqlClr.csproj
 
       - name: Build EfCoreSqlClr (net48)
-        run: dotnet build src/EfCoreSqlClr/EfCoreSqlClr.csproj --configuration Release --no-restore
+        run: dotnet build src/EfCoreSqlClr/EfCoreSqlClr.csproj --configuration Release 
 
       - name: Build EFCore (net9.0) with SQL CLR included
-        run: dotnet build src/EFCore/EFCore.csproj --configuration Release --no-restore
+        run: dotnet build src/EFCore/EFCore.csproj --configuration Release 
 
       - name: Pack EFCore (embed EfCoreSqlClr.dll)
         run: |
           dotnet pack src/EFCore/EFCore.csproj `
             --configuration Release `
-            --no-build `
             --output ${{ github.workspace }}/artifacts `
             -p:SuppressDependenciesWhenPacking=true
 

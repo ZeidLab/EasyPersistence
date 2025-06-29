@@ -12,7 +12,7 @@
     <VersionBase>1.0</VersionBase>
     <BuildNumber>$([System.DateTime]::Now.ToString("yyMM"))</BuildNumber>
     <Revision>$([System.DateTime]::Now.ToString("ddHH"))</Revision>
-    <Version>$(VersionBase).$(BuildNumber).$(Revision)</Version>
+    <Version>$(VersionBase).$(BuildNumber).$(Revision)-preview</Version>
     <!-- Basic Project Properties -->
     <PackageId>$(RootNamespace)</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
