@@ -9,7 +9,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <!-- Versioning -->
     <Deterministic>true</Deterministic>
-    <VersionBase>1.1</VersionBase>
+    <VersionBase>1.2</VersionBase>
     <BuildNumber>$([System.DateTime]::Now.ToString("yyMM"))</BuildNumber>
     <Revision>$([System.DateTime]::Now.ToString("ddHH"))</Revision>
     <Version>$(VersionBase).$(BuildNumber).$(Revision)-preview</Version>
@@ -124,10 +124,10 @@
     <ItemGroup>
       <None Include="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
             Pack="true"
-            PackagePath="lib\netstandard2.0\" />
+            PackagePath="lib\net9.0\" />
       <None Include="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.pdb"
-            Pack="true"
-            PackagePath="lib\netstandard2.0\" />
+            Pack="true" 
+            PackagePath="lib\net9.0\" />
     </ItemGroup>
   </Target>
 </Project>
