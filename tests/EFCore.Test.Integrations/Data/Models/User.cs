@@ -1,9 +1,11 @@
-﻿namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
+﻿using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Events;
+
+namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Models;
 
 public sealed class User : EntityBase<Guid>, IAggregateRoot
 {
     // EF Core requires a parameterless constructor for EF Core to create instances of the entity
-    private User() 
+    private User()
     {
     }
 
@@ -13,7 +15,7 @@ public sealed class User : EntityBase<Guid>, IAggregateRoot
     public DateTime DateOfBirth { get; private set; }
     public UserProfile? Profile { get; private set; }
 
-    public static User Create( string firstName, string lastName, string email, DateTime dateOfBirth)
+    public static User Create(string firstName, string lastName, string email, DateTime dateOfBirth)
     {
         ArgumentNullException.ThrowIfNull(firstName);
 
@@ -21,13 +23,12 @@ public sealed class User : EntityBase<Guid>, IAggregateRoot
 
         ArgumentNullException.ThrowIfNull(email);
 
-        return new User
-        {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            DateOfBirth = dateOfBirth
-        };
+        var user = new User { FirstName = firstName, LastName = lastName, Email = email, DateOfBirth = dateOfBirth };
+        
+        // Raise the UserCreated event
+        user.DomainEvents.Add(new UserIsRegistered(user));
+        
+        return user;
     }
 
     public User WithProfile(UserProfile profile)
@@ -37,6 +38,7 @@ public sealed class User : EntityBase<Guid>, IAggregateRoot
         Profile = profile;
         return this;
     }
+
     public void Update(string firstName, string lastName, string email, DateTime dateOfBirth)
     {
         ArgumentNullException.ThrowIfNull(firstName);
