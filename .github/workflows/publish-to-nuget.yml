@@ -47,16 +47,56 @@ jobs:
           dir
           dir artifacts
 
-      - name: Publish NuGet packages
+      - name: Process NuGet packages (remove PDBs)
         shell: pwsh
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.nupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          $artifactsPath = "${{ github.workspace }}/artifacts"
+          Get-ChildItem -Path $artifactsPath -Filter *.nupkg | ForEach-Object {
+            $nupkgPath = $_.FullName
+            $zipPath = $nupkgPath -replace '\.nupkg$', '.zip'
+            $extractPath = $nupkgPath -replace '\.nupkg$', '_extracted'
+      
+            # Rename to zip
+            Write-Host "Processing $($_.Name)"
+            Copy-Item -Path $nupkgPath -Destination $zipPath
+      
+            # Extract zip
+            Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+      
+            # Remove PDB files
+            Get-ChildItem -Path $extractPath -Filter *.pdb -Recurse | ForEach-Object {
+              Write-Host "Removing PDB: $($_.FullName)"
+              Remove-Item -Path $_.FullName -Force
+            }
+      
+            # List remaining contents
+            Write-Host "Remaining contents:"
+            Get-ChildItem -Path $extractPath -Recurse | Select-Object -ExpandProperty FullName
+      
+            # Create new zip preserving structure (temporarily delete the original nupkg)
+            Remove-Item -Path $zipPath -Force
+            $currentLocation = Get-Location
+            Set-Location -Path $extractPath
+            Compress-Archive -Path * -DestinationPath $zipPath -Force
+            Set-Location -Path $currentLocation
+      
+            # Rename back to nupkg
+            Remove-Item -Path $nupkgPath -Force
+            Move-Item -Path $zipPath -Destination $nupkgPath
+      
+            # Clean up extraction directory
+            Remove-Item -Path $extractPath -Recurse -Force
           }
-
-      - name: Publish symbols packages
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.snupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-          }
+#      - name: Publish NuGet packages
+#        shell: pwsh
+#        run: |
+#          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.nupkg | ForEach-Object {
+#            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+#          }
+#
+#      - name: Publish symbols packages
+#        shell: pwsh
+#        run: |
+#          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.snupkg | ForEach-Object {
+#            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+#          }
