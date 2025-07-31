@@ -4,9 +4,6 @@
     <IsPackable>true</IsPackable>
     <OutputType>Library</OutputType>
 
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>EasyPersistence.EFCore.snk</AssemblyOriginatorKeyFile>
-    <PublicSignedKey>0024000004800000940000000602000000240000525341310004000001000100d18894997cc753770ca16558e7a1e3e8358f88b84b6359a894ac301204c53706df4f0c4d1041ecf08daadcf03e44f328680cc85702b2785abe3ef02cd84a1c43300c2db16c7c08f9fb5be9082e3fd5e4b2c4dec0972a3efa62a832d493903b0617ee56e401cd6ce7eb8b942bba03a8f8d7d131d636282ed9dcfdffe7f9ec1ce6</PublicSignedKey>
     <!-- Include the build assets in the package -->
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
@@ -15,7 +12,7 @@
     <VersionBase>1.0</VersionBase>
     <BuildNumber>$([System.DateTime]::Now.ToString("yyMM"))</BuildNumber>
     <Revision>$([System.DateTime]::Now.ToString("ddHH"))</Revision>
-    <Version>$(VersionBase).$(BuildNumber).$(Revision)</Version>
+    <Version>$(VersionBase).$(BuildNumber).$(Revision)-preview</Version>
     <!-- Basic Project Properties -->
     <PackageId>$(RootNamespace)</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
@@ -45,12 +42,12 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
   </PropertyGroup>
-  
+
   <ItemGroup Label="Documentation and Source Files">
     <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions"/>
@@ -68,14 +65,14 @@
   </ItemGroup>
   <ItemGroup Label="Code Analyzers">
     <PackageReference Include="AsyncMethodNameFixer" PrivateAssets="All"/>
-    <PackageReference Include="ConfigureAwaitChecker.Analyzer"  PrivateAssets="All" />
-    <PackageReference Include="ConfigureAwaitEnforcer" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="All" />
-    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All" />
-    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" PrivateAssets="All" />
-    <PackageReference Include="Roslynator.Formatting.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="All"/>
+    <PackageReference Include="ConfigureAwaitEnforcer" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="All"/>
+    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All"/>
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" PrivateAssets="All"/>
+    <PackageReference Include="Roslynator.Formatting.Analyzers" PrivateAssets="All"/>
     <PackageReference Include="SonarAnalyzer.CSharp">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -84,21 +81,21 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SecurityCodeScan.VS2019" PrivateAssets="All" />
+    <PackageReference Include="SecurityCodeScan.VS2019" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup Label="Test Assembly Attributes">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>$(AssemblyName).Test.UI, PublicKey=$(PublicSignedKey)</_Parameter1>
+      <_Parameter1>$(AssemblyName).Test.UI</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>$(AssemblyName).Test.Integrations, PublicKey=$(PublicSignedKey)</_Parameter1>
+      <_Parameter1>$(AssemblyName).Test.Integrations</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>$(AssemblyName).Test.Units, PublicKey=$(PublicSignedKey)</_Parameter1>
+      <_Parameter1>$(AssemblyName).Test.Units</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>DynamicProxyGenAssembly2, PublicKey=0024000004800000940000000602000000240000525341310004000001000100d18894997cc753770ca16558e7a1e3e8358f88b84b6359a894ac301204c53706df4f0c4d1041ecf08daadcf03e44f328680cc85702b2785abe3ef02cd84a1c43300c2db16c7c08f9fb5be9082e3fd5e4b2c4dec0972a3efa62a832d493903b0617ee56e401cd6ce7eb8b942bba03a8f8d7d131d636282ed9dcfdffe7f9ec1ce6</_Parameter1>
+      <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
@@ -114,18 +111,20 @@
 
   <Target Name="PackEfCoreSqlClrDll" AfterTargets="Build">
     <!-- Copy the EfCoreSqlClr.dll to the output directory with retry logic -->
-    <Copy
-      SourceFiles="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
-      DestinationFolder="$(OutputPath)"
-      SkipUnchangedFiles="true"
-      ContinueOnError="true"
-      RetryDelayMilliseconds="500"
-      Retries="5"/>
+   <Copy
+        SourceFiles="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
+        DestinationFolder="$(OutputPath)"
+        SkipUnchangedFiles="true"
+        ContinueOnError="true"
+        RetryDelayMilliseconds="500"
+        Retries="5"/>
 
 
     <!-- Include the EasyPersistence.EfCoreSqlClr.dll in the NuGet package -->
     <ItemGroup>
-      <None Include="$(OutputPath)\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll" Pack="true" PackagePath="lib\net48\"/>
+      <None Include="..\EfCoreSqlClr\bin\Release\net48\ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.dll"
+            Pack="true"
+            PackagePath="lib\netstandard2.0\" />
     </ItemGroup>
   </Target>
 </Project>

@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{84933542-7AEA-4055-AB08-6E22DF68EB59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FDE29923-9F23-44A0-B637-B5C921D58104}"
@@ -9,13 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		.github\COPILOT.md = .github\COPILOT.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
-		nuget.config = nuget.config
 		global.json = global.json
-		.github\COPILOT.md = .github\COPILOT.md
-		README.md = README.md
 		LICENSE.txt = LICENSE.txt
+		nuget.config = nuget.config
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9A93824F-1E1C-435A-A424-13CD43614A0A}"
@@ -39,9 +42,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{4BE8F2F3-2D6E-4660-A137-D4F9A177F66E}"
 	ProjectSection(SolutionItems) = preProject
-		Docs\Useing-Domain-Events.md = Docs\Useing-Domain-Events.md
 		Docs\Index.md = Docs\Index.md
+		Docs\Useing-Domain-Events.md = Docs\Useing-Domain-Events.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreTestApp", "examples\EFCoreTestApp\EFCoreTestApp.csproj", "{6045C80A-CFF6-46D8-A0A5-045F5ED8862A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +78,13 @@ Global
 		{C4D5D320-163A-40D4-B53D-D8BFBB74D500}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4D5D320-163A-40D4-B53D-D8BFBB74D500}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4D5D320-163A-40D4-B53D-D8BFBB74D500}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6045C80A-CFF6-46D8-A0A5-045F5ED8862A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6045C80A-CFF6-46D8-A0A5-045F5ED8862A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6045C80A-CFF6-46D8-A0A5-045F5ED8862A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6045C80A-CFF6-46D8-A0A5-045F5ED8862A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2DF2B027-3F72-418F-A398-2955FE82C78E} = {84933542-7AEA-4055-AB08-6E22DF68EB59}
@@ -82,5 +94,9 @@ Global
 		{4FDD45B2-E2BD-43FA-A3F3-D7CC6F1057E9} = {84933542-7AEA-4055-AB08-6E22DF68EB59}
 		{C4D5D320-163A-40D4-B53D-D8BFBB74D500} = {FDE29923-9F23-44A0-B637-B5C921D58104}
 		{18B68165-A6AF-4E33-BCA3-374326189687} = {4A7F29E1-24AD-4B6C-BBC8-7DACAE19EECB}
+		{6045C80A-CFF6-46D8-A0A5-045F5ED8862A} = {9A93824F-1E1C-435A-A424-13CD43614A0A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {71E74C7C-0620-4681-B0F8-B555774E8F2B}
 	EndGlobalSection
 EndGlobal
