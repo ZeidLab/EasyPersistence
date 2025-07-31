@@ -9,7 +9,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <!-- Versioning -->
     <Deterministic>true</Deterministic>
-    <VersionBase>1.0</VersionBase>
+    <VersionBase>1.2</VersionBase>
     <BuildNumber>$([System.DateTime]::Now.ToString("yyMM"))</BuildNumber>
     <Revision>$([System.DateTime]::Now.ToString("ddHH"))</Revision>
     <Version>$(VersionBase).$(BuildNumber).$(Revision)</Version>
