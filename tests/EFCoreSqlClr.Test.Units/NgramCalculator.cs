@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units;
+﻿namespace ZeidLab.ToolBox.EasyPersistence.EFCoreSqlClr.Test.Units;
 
 internal static class NgramCalculatorExtensions
 {
