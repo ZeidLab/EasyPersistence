@@ -14,7 +14,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 /// </remarks>
 [SuppressMessage("SonarAnalyzer.CSharp", "S4035:Classes implementing 'IEquatable<T>' should be sealed",
     Justification = "Abstract base class with correct equality implementation")]
-public abstract class EntityBase<TId> : IEquatable<EntityBase<TId>>
+public abstract class EntityBase<TId> : IEquatable<EntityBase<TId>>, IHaveDomainEvents
     where TId : notnull
 {
     /// <summary>
