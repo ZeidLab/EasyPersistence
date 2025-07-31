@@ -21,7 +21,7 @@ To use **EasyPersistence.EFCore** in your project, you can install it via NuGet:
 dotnet add package ZeidLab.ToolBox.EasyPersistence.EFCore
 ```
 
-For more information, please visit [EventBuss Package on NuGet](https://www.nuget.org/packages/ZeidLab.ToolBox.EasyPersistence.EFcore).
+For more information, please visit [EasyPersistence Package on NuGet](https://www.nuget.org/packages/ZeidLab.ToolBox.EasyPersistence.EFcore).
 
 [^ Back To Top](#-what-is-EasyPersistence-library)
 
@@ -50,7 +50,7 @@ With each release, we add new features and fix bugs. You can find the full chang
 
 ## 📖 Usage and Configuration
 
-For more information and detailed usage instructions, please refer to the [EasyPersistence Documentation](https://github.com/ZeidLab/EasyPersistence/index.md).
+For more information and detailed usage instructions, please refer to the [EasyPersistence Documentation](https://github.com/ZeidLab/EasyPersistence/wiki).
 
 [^ Back To Top](#-what-is-EasyPersistence-library)
 
