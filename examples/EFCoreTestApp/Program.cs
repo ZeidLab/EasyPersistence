@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 
-using ZeidLab.ToolBox.EasyPersistence.EFCoreTestApp;
 using ZeidLab.ToolBox.EasyPersistence.EFCoreTestApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);

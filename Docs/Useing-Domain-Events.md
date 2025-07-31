@@ -30,7 +30,7 @@ public sealed class DomainEventPublishingInterceptor : SaveChangesInterceptor
         var context = eventData.Context;
         if (context is null) return result;
 
-        var entities = context.ChangeTracker.Entries<EntityBase<int>>()
+        var entities = context.ChangeTracker.Entries<IHaveDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Count > 0)
             .Select(e => e.Entity)
             .ToList();
