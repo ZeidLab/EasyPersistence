@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9A93824F-1E1C-435A-A424-13CD43614A0A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore", "src\EFCore\EFCore.csproj", "{2DF2B027-3F72-418F-A398-2955FE82C78E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore.Test.Units", "tests\EFCore.Test.Units\EFCore.Test.Units.csproj", "{70C64223-2914-4FD3-9F47-AE86C370659F}"
