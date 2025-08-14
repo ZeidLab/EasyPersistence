@@ -30,7 +30,10 @@ public abstract class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEnti
     where TEntity : EntityBase<TEntityId>, IAggregateRoot
     where TEntityId : notnull
 {
-    private protected readonly DbContext _context;
+    /// <summary>
+    /// Gets the EF Core database context used by this repository for data access operations.
+    /// </summary>
+    protected readonly DbContext _context;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryBase{TEntity, TEntityId}"/> class.
