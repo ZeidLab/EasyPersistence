@@ -33,7 +33,7 @@ public class RepositoryBaseTests : IAsyncLifetime
             options.EnableSensitiveDataLogging();
         });
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
+        services.AddScoped<ITestUnitOfWorkBase, TestUnitOfWorkBase>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -42,7 +42,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task GenerateUsersWithProfiles()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -74,7 +74,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task EntityId_ShouldBeSetAndRetrievedCorrectly()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -99,7 +99,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task EntityId_ShouldBeSetAndRetrievedCorrectlyWhenIsSetFromConstructor()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -123,7 +123,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task FindAllAsync_ShouldReturnMatchingEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -144,7 +144,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task FindFirstOrDefaultAsync_ShouldReturnFirstMatchingEntity()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -165,7 +165,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task Remove_ShouldDeleteEntity()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -187,7 +187,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task GetPagedResultsAsync_ShouldReturnPagedData()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -209,7 +209,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task SearchAsync_ShouldReturnMatchingEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -230,7 +230,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task AddRange_ShouldAddMultipleEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -254,7 +254,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task UpdatePropertyAsync_WithSingleProperty_ShouldUpdateMatchingEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -290,7 +290,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task UpdatePropertyAsync_WithMultipleProperties_ShouldUpdateMatchingEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -328,7 +328,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task UpdatePropertyAsync_WithDifferentPropertyTypes_ShouldUpdateMatchingEntities()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -365,7 +365,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task UpdatePropertyAsync_NoMatchingEntities_ShouldReturnZero()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -392,7 +392,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task CommitTransactionAsync_ShouldPersistChanges()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
@@ -415,7 +415,7 @@ public class RepositoryBaseTests : IAsyncLifetime
     public async Task RollbackTransactionAsync_ShouldDiscardChanges()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
 

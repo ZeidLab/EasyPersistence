@@ -22,7 +22,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 /// }
 /// ]]></code>
 /// </example>
-public interface IUnitOfWork
+public interface IUnitOfWorkBase
 {
     /// <summary>
     /// Saves all changes made in the current context to the database.

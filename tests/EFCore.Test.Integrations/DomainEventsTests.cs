@@ -48,7 +48,7 @@ public sealed class DomainEventsTests : IAsyncLifetime
         services.AddScoped<DomainEventPublishingInterceptor>();
         services.AddScoped<IAppLogsRepository, AppLogsRepository>();
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<ITestUnitOfWorkWithEvents, TestUnitOfWorkWithEvents>();
+        services.AddScoped<ITestUnitOfWorkBaseWithEvents, TestUnitOfWorkBaseWithEvents>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -57,7 +57,7 @@ public sealed class DomainEventsTests : IAsyncLifetime
     public async Task EntityId_ShouldBeSetAndRetrievedCorrectly()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkWithEvents>();
+        var testUnitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBaseWithEvents>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContextWithEvents>();
         var hostedServiceManager = new TestHostedServiceManager(scope.ServiceProvider);
 

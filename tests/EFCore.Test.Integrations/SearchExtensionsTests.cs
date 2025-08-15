@@ -31,7 +31,7 @@ public sealed class SearchExtensionsTests : IAsyncLifetime
         });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
+        services.AddScoped<ITestUnitOfWorkBase, TestUnitOfWorkBase>();
 
         _serviceProvider = services.BuildServiceProvider();
     }

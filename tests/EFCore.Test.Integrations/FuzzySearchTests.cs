@@ -28,7 +28,7 @@ public sealed class FuzzySearchTests : IAsyncLifetime
             options.EnableSensitiveDataLogging();
         });
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<ITestUnitOfWork, TestUnitOfWork>();
+        services.AddScoped<ITestUnitOfWorkBase, TestUnitOfWorkBase>();
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -40,7 +40,7 @@ public sealed class FuzzySearchTests : IAsyncLifetime
         await dbContext.Database.EnsureCreatedAsync();
         await dbContext.InitializeSqlClrAsync();
 
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWork>();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<ITestUnitOfWorkBase>();
         // var usersRepository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
 
         // Arrange

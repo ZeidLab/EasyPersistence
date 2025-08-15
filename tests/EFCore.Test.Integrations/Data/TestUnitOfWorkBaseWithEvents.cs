@@ -3,15 +3,15 @@ using ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.Repositories
 
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data;
 
-internal sealed class TestUnitOfWorkWithEvents: 
+internal sealed class TestUnitOfWorkBaseWithEvents: 
     UnitOfWorkBase<TestDbContextWithEvents> 
-    , ITestUnitOfWorkWithEvents
+    , ITestUnitOfWorkBaseWithEvents
 {
     public IUsersRepository Users { get; }
     public IAppLogsRepository AppLogs { get; }
 
 
-    public TestUnitOfWorkWithEvents(TestDbContextWithEvents context): base(context)
+    public TestUnitOfWorkBaseWithEvents(TestDbContextWithEvents context): base(context)
     {
         Users = new UsersRepository(context);
         AppLogs = new AppLogsRepository(context);

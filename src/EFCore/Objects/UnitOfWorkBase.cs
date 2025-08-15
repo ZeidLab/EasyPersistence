@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 
 /// <summary>
-/// Provides a base implementation of <see cref="IUnitOfWork"/> for EF Core <see cref="DbContext"/>.
+/// Provides a base implementation of <see cref="IUnitOfWorkBase"/> for EF Core <see cref="DbContext"/>.
 /// </summary>
 /// <typeparam name="TContext">The type of the <see cref="DbContext"/>.</typeparam>
 /// <remarks>
@@ -25,7 +25,7 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore;
 /// await myUnitOfWork.CommitTransactionAsync();
 /// ]]></code>
 /// </example>
-public abstract class UnitOfWorkBase<TContext> : IUnitOfWork, IAsyncDisposable
+public abstract class UnitOfWorkBase<TContext> : IUnitOfWorkBase, IAsyncDisposable
     where TContext : DbContext
 {
     /// <summary>

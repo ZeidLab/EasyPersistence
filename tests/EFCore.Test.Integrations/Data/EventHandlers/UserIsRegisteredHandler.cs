@@ -7,13 +7,13 @@ namespace ZeidLab.ToolBox.EasyPersistence.EFCore.Test.Integrations.Data.EventHan
 internal sealed class UserIsRegisteredHandler : IAppEventHandler<UserIsRegistered>
 {
 
-    private readonly ITestUnitOfWorkWithEvents _unitOfWork;
+    private readonly ITestUnitOfWorkBaseWithEvents _unitOfWorkBase;
 
 
-    public UserIsRegisteredHandler( ITestUnitOfWorkWithEvents unitOfWork)
+    public UserIsRegisteredHandler( ITestUnitOfWorkBaseWithEvents unitOfWorkBase)
     {
        
-        _unitOfWork = unitOfWork;
+        _unitOfWorkBase = unitOfWorkBase;
     }
     
     public async Task HandleAsync(UserIsRegistered appEvent, CancellationToken cancellationToken = new CancellationToken())
@@ -21,10 +21,10 @@ internal sealed class UserIsRegisteredHandler : IAppEventHandler<UserIsRegistere
         var log1 = AppLog.Create($"Handling event: {appEvent.GetType().Name}");
         var log2 = AppLog.Create($"User: {appEvent.UserInfo.FirstName}, Email: {appEvent.UserInfo.Email}");
 
-        _unitOfWork.AppLogs.Add(log1);
-        _unitOfWork.AppLogs.Add(log2);
+        _unitOfWorkBase.AppLogs.Add(log1);
+        _unitOfWorkBase.AppLogs.Add(log2);
         
         // Your implementation here
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWorkBase.SaveChangesAsync(cancellationToken);
     }
 }
